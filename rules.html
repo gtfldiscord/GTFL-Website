@@ -93,7 +93,7 @@
         }
 
         .language-button {
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
@@ -118,6 +118,7 @@
         .language-button img {
             width: 20px;
             height: 14px;
+            min-width: 20px;
             object-fit: cover;
             display: block;
             border-radius: 2px;
@@ -422,6 +423,7 @@
             .language-button img {
                 width: 18px;
                 height: 12px;
+                min-width: 18px;
             }
 
             .home-button {
@@ -479,7 +481,7 @@
                     class="language-button active"
                     onclick="setLanguage('es')">
 
-                    <img src="españa.png" alt="España">
+                    <img src="espana.png" alt="Español">
 
                     Español
 
@@ -490,7 +492,7 @@
                     class="language-button"
                     onclick="setLanguage('en')">
 
-                    <img src="inglaterra.png" alt="Inglaterra">
+                    <img src="inglaterra.png" alt="English">
 
                     English
 
@@ -612,6 +614,7 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="Cualquier incumplimiento de las normas establecidas por la GTFL podrá conllevar sanciones disciplinarias."
                         data-en="Any violation of the rules established by GTFL may result in disciplinary sanctions.">
@@ -633,6 +636,7 @@
                         data-en="Publishing photographs of other people is only permitted when the person concerned has given consent. Sharing private photographs without consent may be sanctioned.">
                         La publicación de fotografías de otras personas únicamente estará permitida cuando exista <strong>consentimiento de la persona afectada</strong>. La difusión de fotografías privadas sin consentimiento podrá ser sancionada.
                     </span>
+
                 </p>
 
             </article>
@@ -649,6 +653,7 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="La GTFL tomará como referencia gran parte del reglamento utilizado por ATF, adaptándolo a las necesidades y funcionamiento de Glory Touch Football League."
                         data-en="GTFL will use a large part of the regulations used by ATF as a reference, adapting them to the needs and operation of Glory Touch Football League.">
@@ -662,6 +667,7 @@
                         data-en="In situations not specifically covered by these regulations, the organization may make a decision based on the applicable ATF criteria and rules.">
                         En aquellas situaciones no contempladas específicamente por este reglamento, la organización podrá tomar una decisión basándose en los criterios y normas aplicables de ATF.
                     </span>
+
                 </p>
 
             </article>
@@ -678,6 +684,7 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="El desconocimiento de una norma no exime de su cumplimiento."
                         data-en="Ignorance of a rule does not exempt anyone from complying with it.">
@@ -691,6 +698,7 @@
                         data-en="Violations may result in warnings, sanctions, suspensions, expulsions or bans depending on the severity of the offence.">
                         El incumplimiento de cualquier norma podrá conllevar advertencias, sanciones, suspensiones, expulsiones o baneos dependiendo de la gravedad de la infracción.
                     </span>
+
                 </p>
 
             </article>
@@ -724,6 +732,7 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="Los jugadores únicamente podrán disputar partidos oficiales utilizando la cuenta que tengan registrada y verificada mediante Double Counter y Bloxlink."
                         data-en="Players may only participate in official matches using the account registered and verified through Double Counter and Bloxlink.">
@@ -737,6 +746,7 @@
                         data-en="If a player participates in an official match using an account different from their registered account, the match may be declared an FFT in favor of the opposing team.">
                         Si un jugador participa en un partido oficial utilizando una cuenta diferente a la registrada, el encuentro podrá ser declarado <strong>FFT a favor del equipo rival</strong>.
                     </span>
+
                 </p>
 
             </article>
@@ -749,6 +759,7 @@
                 <h4>Alt Accounts</h4>
 
                 <p>
+
                     <span
                         data-es="No está permitido utilizar cuentas alternativas para disputar partidos oficiales, obtener ventajas competitivas o evitar sanciones."
                         data-en="The use of alternate accounts to participate in official matches, gain competitive advantages or evade sanctions is prohibited.">
@@ -762,6 +773,7 @@
                         data-en="The use of an alternate account may result in a disciplinary sanction.">
                         El uso de una cuenta alternativa podrá conllevar una sanción disciplinaria.
                     </span>
+
                 </p>
 
             </article>
@@ -774,6 +786,7 @@
                 <h4>Account Sharing</h4>
 
                 <p>
+
                     <span
                         data-es="El intercambio o préstamo de cuentas entre usuarios estará prohibido."
                         data-en="Sharing or lending accounts between users is prohibited.">
@@ -787,6 +800,7 @@
                         data-en="Account sharing may result in an economic fine and permanent ban, depending on the circumstances of the case.">
                         El <strong>Account Sharing</strong> podrá resultar en una <strong>multa económica y un baneo permanente</strong>, dependiendo de las circunstancias del caso.
                     </span>
+
                 </p>
 
             </article>
@@ -799,6 +813,7 @@
                 <h4>Double Counter</h4>
 
                 <p>
+
                     <span
                         data-es="Todo jugador deberá estar verificado mediante Double Counter para poder participar en partidos oficiales."
                         data-en="Every player must be verified through Double Counter to participate in official matches.">
@@ -820,6 +835,7 @@
                         data-en="If they participate anyway, the match may be declared an FFT in favor of the opposing team.">
                         Si participa igualmente, el partido podrá ser declarado <strong>FFT a favor del equipo rival</strong>.
                     </span>
+
                 </p>
 
             </article>
@@ -853,11 +869,13 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="Los clubes interesados en participar en la GTFL deberán realizar su inscripción mediante los sistemas de postulación habilitados por la organización, incluyendo tickets o formularios de postulación cuando estos estén disponibles."
                         data-en="Clubs interested in participating in GTFL must register through the application systems provided by the organization, including tickets or application forms when available.">
                         Los clubes interesados en participar en la GTFL deberán realizar su inscripción mediante los sistemas de postulación habilitados por la organización, incluyendo tickets o formularios de postulación cuando estos estén disponibles.
                     </span>
+
                 </p>
 
             </article>
@@ -874,6 +892,7 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="Las plantillas de la GTFL tendrán un máximo de 12 jugadores."
                         data-en="GTFL squads will have a maximum of 12 players.">
@@ -887,6 +906,7 @@
                         data-en="Once the established limit is reached, no additional players may be added to the Squad Sheet until a place becomes available.">
                         Una vez alcanzado el límite establecido, no podrán añadirse nuevos jugadores a la Squad Sheet hasta que exista una plaza disponible.
                     </span>
+
                 </p>
 
             </article>
@@ -903,6 +923,7 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="Los fichajes podrán realizarse mediante el sistema oficial de GTFL Bot."
                         data-en="Transfers may be carried out through the official GTFL Bot system.">
@@ -924,9 +945,11 @@
                         data-en="Releases may be carried out for reasons such as:">
                         Los releases podrán realizarse por causas como:
                     </span>
+
                 </p>
 
                 <ul>
+
                     <li
                         data-es="Baneo."
                         data-en="Ban.">
@@ -940,9 +963,11 @@
                         data-en="Other reasons established by the organization.">
                         Otras causas contempladas por la organización.
                     </li>
+
                 </ul>
 
                 <p>
+
                     <br>
 
                     <span
@@ -958,6 +983,7 @@
                         data-en="Financial transfers between clubs may also exist when carried out through the systems and conditions established by GTFL.">
                         También podrán existir transferencias económicas entre clubes cuando estas se realicen mediante los sistemas y condiciones establecidos por la GTFL.
                     </span>
+
                 </p>
 
             </article>
@@ -991,6 +1017,7 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="La GTFL seguirá como referencia las reglas de partido utilizadas por ATF."
                         data-en="GTFL will use the match rules used by ATF as a reference.">
@@ -1076,6 +1103,7 @@
                         data-en="If a team does not reach the required minimum number of players within this period, an FFT may be awarded to the opposing team.">
                         Si un equipo no alcanza el mínimo de jugadores necesario dentro de dicho plazo, podrá ser sancionado con <strong>FFT a favor del equipo rival</strong>.
                     </span>
+
                 </p>
 
             </article>
@@ -1092,6 +1120,7 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="Los árbitros deberán conocer y utilizar correctamente los comandos y sistemas necesarios para desempeñar su función."
                         data-en="Referees must know and correctly use the commands and systems required to perform their duties.">
@@ -1129,6 +1158,7 @@
                         data-en="Failure to meet these deadlines may result in a warning, sanction or further disciplinary action.">
                         El incumplimiento de estos plazos podrá resultar en una advertencia, sanción o medida disciplinaria superior.
                     </span>
+
                 </p>
 
             </article>
@@ -1145,6 +1175,7 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="Los resultados oficiales deberán registrarse en la web oficial de GTFL en un plazo inferior a 24 horas desde la finalización del encuentro."
                         data-en="Official results must be registered on the official GTFL website within 24 hours of the end of the match.">
@@ -1166,6 +1197,7 @@
                         data-en="Referees must report any sanction, card, sending-off or incident that occurred during the match.">
                         Los árbitros deberán informar de cualquier sanción, tarjeta, expulsión o incidencia producida durante el encuentro.
                     </span>
+
                 </p>
 
             </article>
@@ -1199,6 +1231,7 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="Los participantes deberán mantener una conducta adecuada durante los encuentros."
                         data-en="Participants must maintain appropriate conduct during matches.">
@@ -1212,6 +1245,7 @@
                         data-en="Disrespectful or otherwise offensive behavior may be sanctioned with:">
                         Las faltas de respeto u otras conductas ofensivas podrán ser sancionadas mediante:
                     </span>
+
                 </p>
 
                 <ul>
@@ -1268,6 +1302,7 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="No se permitirá el abuso, acoso o comportamiento gravemente ofensivo hacia otros participantes."
                         data-en="Abuse, harassment or seriously offensive behavior towards other participants will not be permitted.">
@@ -1281,6 +1316,7 @@
                         data-en="Serious cases should be reported through a ticket so they can be reviewed by the organization.">
                         Los casos que presenten una gravedad considerable deberán ser comunicados mediante <strong>ticket</strong> para que puedan ser revisados por la organización.
                     </span>
+
                 </p>
 
             </article>
@@ -1297,6 +1333,7 @@
                 </h4>
 
                 <p>
+
                     <span
                         data-es="La GTFL utilizará como referencia las normas y sanciones aplicables de ATF, debido a que la competición utilizará la Match Pitch de ATF."
                         data-en="GTFL will use the applicable ATF rules and sanctions as a reference because the competition will use the ATF Match Pitch.">
@@ -1318,6 +1355,7 @@
                         data-en="The use of exploits, cheats, bugs or any method intended to gain an unfair advantage may be sanctioned according to the applicable ATF rules and decisions of the GTFL organization.">
                         El uso de exploits, trampas, bugs o cualquier método destinado a obtener una ventaja injusta podrá ser sancionado de acuerdo con las normas aplicables de ATF y las decisiones de la organización GTFL.
                     </span>
+
                 </p>
 
             </article>
