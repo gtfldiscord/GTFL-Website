@@ -30,9 +30,7 @@
                 url("background.jpg") center center / cover fixed no-repeat;
         }
 
-        /* =========================
-           HEADER
-        ========================= */
+        /* HEADER */
 
         .header {
             width: 100%;
@@ -76,6 +74,48 @@
             opacity: 0.5;
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .language {
+            display: flex;
+            gap: 5px;
+            padding: 4px;
+
+            border: 1px solid rgba(255,255,255,0.16);
+            border-radius: 8px;
+
+            background: rgba(255,255,255,0.05);
+        }
+
+        .language button {
+            border: none;
+            background: transparent;
+            color: rgba(255,255,255,0.45);
+
+            width: 38px;
+            height: 32px;
+
+            border-radius: 5px;
+
+            font-size: 18px;
+            cursor: pointer;
+
+            transition: 0.2s ease;
+        }
+
+        .language button:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+        .language button.active {
+            background: rgba(255,255,255,0.14);
+            color: white;
+        }
+
         .home-button {
             color: white;
             text-decoration: none;
@@ -98,9 +138,7 @@
             background: rgba(255,255,255,0.13);
         }
 
-        /* =========================
-           LAYOUT
-        ========================= */
+        /* LAYOUT */
 
         .layout {
             max-width: 1250px;
@@ -113,9 +151,7 @@
             align-items: start;
         }
 
-        /* =========================
-           SIDEBAR
-        ========================= */
+        /* SIDEBAR */
 
         .sidebar {
             position: sticky;
@@ -171,9 +207,7 @@
             opacity: 0.4;
         }
 
-        /* =========================
-           CONTENT HEADER
-        ========================= */
+        /* CONTENT */
 
         .content-header {
             margin-bottom: 45px;
@@ -200,9 +234,7 @@
             opacity: 0.55;
         }
 
-        /* =========================
-           SECTIONS
-        ========================= */
+        /* SECTIONS */
 
         .regulation-section {
             margin-bottom: 42px;
@@ -231,9 +263,7 @@
             letter-spacing: 1px;
         }
 
-        /* =========================
-           ARTICLES
-        ========================= */
+        /* ARTICLES */
 
         .article {
             padding: 27px 5px;
@@ -285,9 +315,7 @@
             color: rgba(255,255,255,0.68);
         }
 
-        /* =========================
-           FOOTER
-        ========================= */
+        /* FOOTER */
 
         .footer {
             max-width: 1250px;
@@ -304,9 +332,7 @@
             opacity: 0.35;
         }
 
-        /* =========================
-           MOBILE
-        ========================= */
+        /* MOBILE */
 
         @media (max-width: 850px) {
 
@@ -322,7 +348,6 @@
             .sidebar {
                 position: relative;
                 top: auto;
-
                 margin-bottom: 45px;
             }
 
@@ -333,6 +358,22 @@
 
             .content-header h2 {
                 font-size: 30px;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .header-inner {
+                flex-wrap: wrap;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .sidebar a {
+                width: 100%;
             }
         }
 
@@ -349,15 +390,6 @@
             .brand img {
                 width: 45px;
                 height: 45px;
-            }
-
-            .home-button {
-                padding: 8px 11px;
-                font-size: 10px;
-            }
-
-            .sidebar a {
-                width: 100%;
             }
 
             .content-header h2 {
@@ -397,9 +429,32 @@
 
         </div>
 
-        <a href="index.html" class="home-button">
-            INICIO
-        </a>
+        <div class="header-actions">
+
+            <div class="language">
+
+                <button
+                    id="esButton"
+                    class="active"
+                    onclick="setLanguage('es')"
+                    title="Español">
+                    🇪🇸
+                </button>
+
+                <button
+                    id="enButton"
+                    onclick="setLanguage('en')"
+                    title="English">
+                    🇬🇧
+                </button>
+
+            </div>
+
+            <a href="index.html" class="home-button">
+                <span data-es="INICIO" data-en="HOME">INICIO</span>
+            </a>
+
+        </div>
 
     </div>
 
@@ -412,33 +467,46 @@
 
     <aside class="sidebar">
 
-        <div class="sidebar-title">
+        <div
+            class="sidebar-title"
+            data-es="REGLAMENTO"
+            data-en="REGULATIONS">
             REGLAMENTO
         </div>
 
         <a href="#normas">
             <span class="sidebar-number">01</span>
-            Normas Generales
+            <span data-es="Normas Generales" data-en="General Rules">
+                Normas Generales
+            </span>
         </a>
 
         <a href="#cuentas">
             <span class="sidebar-number">02</span>
-            Cuentas y Seguridad
+            <span data-es="Cuentas y Seguridad" data-en="Accounts & Security">
+                Cuentas y Seguridad
+            </span>
         </a>
 
         <a href="#clubes">
             <span class="sidebar-number">03</span>
-            Clubes y Jugadores
+            <span data-es="Clubes y Jugadores" data-en="Clubs & Players">
+                Clubes y Jugadores
+            </span>
         </a>
 
         <a href="#partidos">
             <span class="sidebar-number">04</span>
-            Partidos
+            <span data-es="Partidos" data-en="Matches">
+                Partidos
+            </span>
         </a>
 
         <a href="#conducta">
             <span class="sidebar-number">05</span>
-            Conducta
+            <span data-es="Conducta" data-en="Conduct">
+                Conducta
+            </span>
         </a>
 
     </aside>
@@ -450,13 +518,22 @@
 
         <div class="content-header">
 
-            <div class="small-title">
+            <div
+                class="small-title"
+                data-es="DOCUMENTACIÓN OFICIAL"
+                data-en="OFFICIAL DOCUMENTATION">
                 DOCUMENTACIÓN OFICIAL
             </div>
 
-            <h2>Reglamento Oficial</h2>
+            <h2
+                data-es="Reglamento Oficial"
+                data-en="Official Regulations">
+                Reglamento Oficial
+            </h2>
 
-            <p>
+            <p
+                data-es="Normativa oficial de la Glory Touch Football League. Este reglamento establece las normas de participación, competición, conducta y funcionamiento de la liga."
+                data-en="Official regulations of the Glory Touch Football League. These regulations establish the rules governing participation, competition, conduct and the operation of the league.">
                 Normativa oficial de la Glory Touch Football League.
                 Este reglamento establece las normas de participación,
                 competición, conducta y funcionamiento de la liga.
@@ -471,19 +548,33 @@
 
             <div class="section-heading">
                 <span class="section-number">01</span>
-                <h3>NORMAS GENERALES</h3>
+
+                <h3
+                    data-es="NORMAS GENERALES"
+                    data-en="GENERAL RULES">
+                    NORMAS GENERALES
+                </h3>
             </div>
 
 
             <article class="article">
 
-                <div class="article-number">
+                <div
+                    class="article-number"
+                    data-es="ARTÍCULO 01"
+                    data-en="ARTICLE 01">
                     ARTÍCULO 01
                 </div>
 
-                <h4>Aplicación del reglamento</h4>
+                <h4
+                    data-es="Aplicación del reglamento"
+                    data-en="Application of the Regulations">
+                    Aplicación del reglamento
+                </h4>
 
-                <p>
+                <p
+                    data-es="Cualquier incumplimiento de las normas establecidas por la GTFL podrá conllevar sanciones disciplinarias. Las infracciones especialmente graves, como amenazas de muerte, acoso grave, filtración de información privada, publicación de IPs, doxxing, publicación de contenido pornográfico, NSFW, gore o CP, podrán resultar en un baneo permanente de la comunidad. La publicación de fotografías de otras personas únicamente estará permitida cuando exista consentimiento de la persona afectada. La difusión de fotografías privadas sin consentimiento podrá ser sancionada."
+                    data-en="Any violation of the rules established by GTFL may result in disciplinary sanctions. Particularly serious offences, such as death threats, severe harassment, leaking private information, publishing IP addresses, doxxing, pornographic content, NSFW, gore or CSAM, may result in a permanent ban from the community. Publishing photographs of other people is only permitted when the person concerned has given consent. Sharing private photographs without consent may be sanctioned.">
                     Cualquier incumplimiento de las normas establecidas por la GTFL podrá conllevar sanciones disciplinarias.
                     <br><br>
                     Las infracciones especialmente graves, como amenazas de muerte, acoso grave, filtración de información privada, publicación de IPs, doxxing, publicación de contenido pornográfico, NSFW, gore o CP, podrán resultar en un <strong>baneo permanente</strong> de la comunidad.
@@ -500,9 +591,15 @@
                     ARTÍCULO 02
                 </div>
 
-                <h4>Autoridad de la competición</h4>
+                <h4
+                    data-es="Autoridad de la competición"
+                    data-en="Competition Authority">
+                    Autoridad de la competición
+                </h4>
 
-                <p>
+                <p
+                    data-es="La GTFL tomará como referencia gran parte del reglamento utilizado por ATF, adaptándolo a las necesidades y funcionamiento de Glory Touch Football League. En aquellas situaciones no contempladas específicamente por este reglamento, la organización podrá tomar una decisión basándose en los criterios y normas aplicables de ATF."
+                    data-en="GTFL will use a large part of the regulations used by ATF as a reference, adapting them to the needs and operation of the Glory Touch Football League. In situations not specifically covered by these regulations, the organization may make a decision based on the applicable ATF criteria and rules.">
                     La GTFL tomará como referencia gran parte del reglamento utilizado por <strong>ATF</strong>, adaptándolo a las necesidades y funcionamiento de Glory Touch Football League.
                     <br><br>
                     En aquellas situaciones no contempladas específicamente por este reglamento, la organización podrá tomar una decisión basándose en los criterios y normas aplicables de ATF.
@@ -517,9 +614,15 @@
                     ARTÍCULO 03
                 </div>
 
-                <h4>Cumplimiento de las normas</h4>
+                <h4
+                    data-es="Cumplimiento de las normas"
+                    data-en="Compliance with the Rules">
+                    Cumplimiento de las normas
+                </h4>
 
-                <p>
+                <p
+                    data-es="El desconocimiento de una norma no exime de su cumplimiento. El incumplimiento de cualquier norma podrá conllevar advertencias, sanciones, suspensiones, expulsiones o baneos dependiendo de la gravedad de la infracción."
+                    data-en="Ignorance of a rule does not exempt anyone from complying with it. Violations may result in warnings, sanctions, suspensions, expulsions or bans depending on the severity of the offence.">
                     El desconocimiento de una norma no exime de su cumplimiento.
                     <br><br>
                     El incumplimiento de cualquier norma podrá conllevar advertencias, sanciones, suspensiones, expulsiones o baneos dependiendo de la gravedad de la infracción.
@@ -536,19 +639,28 @@
 
             <div class="section-heading">
                 <span class="section-number">02</span>
-                <h3>CUENTAS Y SEGURIDAD</h3>
+
+                <h3
+                    data-es="CUENTAS Y SEGURIDAD"
+                    data-en="ACCOUNTS & SECURITY">
+                    CUENTAS Y SEGURIDAD
+                </h3>
             </div>
 
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 04
-                </div>
+                <div class="article-number">ARTÍCULO 04</div>
 
-                <h4>Cuenta registrada</h4>
+                <h4
+                    data-es="Cuenta registrada"
+                    data-en="Registered Account">
+                    Cuenta registrada
+                </h4>
 
-                <p>
+                <p
+                    data-es="Los jugadores únicamente podrán disputar partidos oficiales utilizando la cuenta que tengan registrada y verificada mediante Double Counter y Bloxlink. Si un jugador participa en un partido oficial utilizando una cuenta diferente a la registrada, el encuentro podrá ser declarado FFT a favor del equipo rival."
+                    data-en="Players may only participate in official matches using the account registered and verified through Double Counter and Bloxlink. If a player participates in an official match using an account different from their registered account, the match may be declared an FFT in favor of the opposing team.">
                     Los jugadores únicamente podrán disputar partidos oficiales utilizando la cuenta que tengan registrada y verificada mediante <strong>Double Counter y Bloxlink</strong>.
                     <br><br>
                     Si un jugador participa en un partido oficial utilizando una cuenta diferente a la registrada, el encuentro podrá ser declarado <strong>FFT a favor del equipo rival</strong>.
@@ -559,13 +671,17 @@
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 05
-                </div>
+                <div class="article-number">ARTÍCULO 05</div>
 
-                <h4>Alt Accounts</h4>
+                <h4
+                    data-es="Alt Accounts"
+                    data-en="Alt Accounts">
+                    Alt Accounts
+                </h4>
 
-                <p>
+                <p
+                    data-es="No está permitido utilizar cuentas alternativas para disputar partidos oficiales, obtener ventajas competitivas o evitar sanciones. El uso de una cuenta alternativa podrá conllevar una sanción disciplinaria."
+                    data-en="The use of alternate accounts to participate in official matches, gain competitive advantages or evade sanctions is prohibited. The use of an alternate account may result in a disciplinary sanction.">
                     No está permitido utilizar cuentas alternativas para disputar partidos oficiales, obtener ventajas competitivas o evitar sanciones.
                     <br><br>
                     El uso de una cuenta alternativa podrá conllevar una sanción disciplinaria.
@@ -576,13 +692,17 @@
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 06
-                </div>
+                <div class="article-number">ARTÍCULO 06</div>
 
-                <h4>Account Sharing</h4>
+                <h4
+                    data-es="Account Sharing"
+                    data-en="Account Sharing">
+                    Account Sharing
+                </h4>
 
-                <p>
+                <p
+                    data-es="El intercambio o préstamo de cuentas entre usuarios estará prohibido. El Account Sharing podrá resultar en una multa económica y un baneo permanente, dependiendo de las circunstancias del caso."
+                    data-en="Sharing or lending accounts between users is prohibited. Account sharing may result in an economic fine and permanent ban, depending on the circumstances of the case.">
                     El intercambio o préstamo de cuentas entre usuarios estará prohibido.
                     <br><br>
                     El <strong>Account Sharing</strong> podrá resultar en una <strong>multa económica y un baneo permanente</strong>, dependiendo de las circunstancias del caso.
@@ -593,13 +713,17 @@
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 07
-                </div>
+                <div class="article-number">ARTÍCULO 07</div>
 
-                <h4>Double Counter</h4>
+                <h4
+                    data-es="Double Counter"
+                    data-en="Double Counter">
+                    Double Counter
+                </h4>
 
-                <p>
+                <p
+                    data-es="Todo jugador deberá estar verificado mediante Double Counter para poder participar en partidos oficiales. Un jugador que no cumpla con la verificación requerida no podrá disputar el encuentro. Si participa igualmente, el partido podrá ser declarado FFT a favor del equipo rival."
+                    data-en="Every player must be verified through Double Counter to participate in official matches. A player who does not meet the required verification cannot participate in the match. If they participate anyway, the match may be declared an FFT in favor of the opposing team.">
                     Todo jugador deberá estar verificado mediante <strong>Double Counter</strong> para poder participar en partidos oficiales.
                     <br><br>
                     Un jugador que no cumpla con la verificación requerida no podrá disputar el encuentro.
@@ -618,19 +742,28 @@
 
             <div class="section-heading">
                 <span class="section-number">03</span>
-                <h3>CLUBES Y JUGADORES</h3>
+
+                <h3
+                    data-es="CLUBES Y JUGADORES"
+                    data-en="CLUBS & PLAYERS">
+                    CLUBES Y JUGADORES
+                </h3>
             </div>
 
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 08
-                </div>
+                <div class="article-number">ARTÍCULO 08</div>
 
-                <h4>Inscripción</h4>
+                <h4
+                    data-es="Inscripción"
+                    data-en="Registration">
+                    Inscripción
+                </h4>
 
-                <p>
+                <p
+                    data-es="Los clubes interesados en participar en la GTFL deberán realizar su inscripción mediante los sistemas de postulación habilitados por la organización, incluyendo tickets o formularios de postulación cuando estos estén disponibles."
+                    data-en="Clubs interested in participating in GTFL must register through the application systems provided by the organization, including tickets or application forms when available.">
                     Los clubes interesados en participar en la GTFL deberán realizar su inscripción mediante los sistemas de postulación habilitados por la organización, incluyendo tickets o formularios de postulación cuando estos estén disponibles.
                 </p>
 
@@ -639,13 +772,17 @@
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 09
-                </div>
+                <div class="article-number">ARTÍCULO 09</div>
 
-                <h4>Plantillas</h4>
+                <h4
+                    data-es="Plantillas"
+                    data-en="Squads">
+                    Plantillas
+                </h4>
 
-                <p>
+                <p
+                    data-es="Las plantillas de la GTFL tendrán un máximo de 12 jugadores. Una vez alcanzado el límite establecido, no podrán añadirse nuevos jugadores a la Squad Sheet hasta que exista una plaza disponible."
+                    data-en="GTFL squads will have a maximum of 12 players. Once the established limit is reached, no additional players may be added to the Squad Sheet until a place becomes available.">
                     Las plantillas de la GTFL tendrán un máximo de <strong>12 jugadores</strong>.
                     <br><br>
                     Una vez alcanzado el límite establecido, no podrán añadirse nuevos jugadores a la Squad Sheet hasta que exista una plaza disponible.
@@ -656,13 +793,17 @@
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 10
-                </div>
+                <div class="article-number">ARTÍCULO 10</div>
 
-                <h4>Transferencias</h4>
+                <h4
+                    data-es="Transferencias"
+                    data-en="Transfers">
+                    Transferencias
+                </h4>
 
-                <p>
+                <p
+                    data-es="Los fichajes podrán realizarse mediante el sistema oficial de GTFL Bot. El equipo interesado podrá enviar una oferta al jugador mediante el sistema correspondiente. Los releases podrán realizarse por causas como baneo, Force Release u otras causas contempladas por la organización. El Force Release tendrá un coste de 29 Robux. También podrán existir transferencias económicas entre clubes cuando estas se realicen mediante los sistemas y condiciones establecidos por la GTFL."
+                    data-en="Transfers may be carried out through the official GTFL Bot system. The interested team may send an offer to the player through the corresponding system. Releases may be carried out for reasons such as bans, Force Release or other reasons established by the organization. Force Release will have a cost of 29 Robux. Financial transfers between clubs may also exist when carried out through the systems and conditions established by GTFL.">
                     Los fichajes podrán realizarse mediante el sistema oficial de <strong>GTFL Bot</strong>.
                     <br><br>
                     El equipo interesado podrá enviar una oferta al jugador mediante el sistema correspondiente.
@@ -671,16 +812,47 @@
                 </p>
 
                 <ul>
-                    <li>Baneo.</li>
-                    <li>Force Release.</li>
-                    <li>Otras causas contempladas por la organización.</li>
+                    <li
+                        data-es="Baneo."
+                        data-en="Ban.">
+                        Baneo.
+                    </li>
+
+                    <li
+                        data-es="Force Release."
+                        data-en="Force Release.">
+                        Force Release.
+                    </li>
+
+                    <li
+                        data-es="Otras causas contempladas por la organización."
+                        data-en="Other reasons established by the organization.">
+                        Otras causas contempladas por la organización.
+                    </li>
                 </ul>
 
                 <p>
                     <br>
-                    El <strong>Force Release tendrá un coste de 29 Robux</strong>.
+                    <span
+                        data-es="El "
+                        data-en="The ">
+                        El
+                    </span>
+                    <strong>Force Release</strong>
+
+                    <span
+                        data-es=" tendrá un coste de 29 Robux."
+                        data-en=" will have a cost of 29 Robux.">
+                        tendrá un coste de 29 Robux.
+                    </span>
+
                     <br><br>
-                    También podrán existir transferencias económicas entre clubes cuando estas se realicen mediante los sistemas y condiciones establecidos por la GTFL.
+
+                    <span
+                        data-es="También podrán existir transferencias económicas entre clubes cuando estas se realicen mediante los sistemas y condiciones establecidos por la GTFL."
+                        data-en="Financial transfers between clubs may also exist when carried out through the systems and conditions established by GTFL.">
+                        También podrán existir transferencias económicas entre clubes cuando estas se realicen mediante los sistemas y condiciones establecidos por la GTFL.
+                    </span>
                 </p>
 
             </article>
@@ -694,19 +866,28 @@
 
             <div class="section-heading">
                 <span class="section-number">04</span>
-                <h3>PARTIDOS</h3>
+
+                <h3
+                    data-es="PARTIDOS"
+                    data-en="MATCHES">
+                    PARTIDOS
+                </h3>
             </div>
 
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 11
-                </div>
+                <div class="article-number">ARTÍCULO 11</div>
 
-                <h4>Desarrollo del partido</h4>
+                <h4
+                    data-es="Desarrollo del partido"
+                    data-en="Match Procedure">
+                    Desarrollo del partido
+                </h4>
 
-                <p>
+                <p
+                    data-es="La GTFL seguirá como referencia las reglas de partido utilizadas por ATF. Cuando un gol sea concedido por el árbitro, será considerado válido siempre que no exista una infracción previa que invalide la jugada. Cada equipo dispondrá de un máximo de 3 sustituciones durante el tiempo reglamentario. En caso de tiempo extra, cada equipo dispondrá de 1 sustitución adicional. Un jugador sustituido no podrá volver a entrar al terreno de juego durante el mismo partido. Los jugadores expulsados mediante tarjeta roja no podrán continuar participando en el encuentro. Todos los jugadores deberán respetar el procedimiento establecido para el saque inicial. El mínimo necesario para comenzar un partido será de 5 jugadores por equipo. El código de acceso al servidor será compartido entre 20 y 10 minutos antes de la hora programada del encuentro. Una vez llegada la hora oficial del partido, se concederá un máximo de 10 minutos de espera para que los jugadores puedan incorporarse. Si un equipo no alcanza el mínimo de jugadores necesario dentro de dicho plazo, podrá ser sancionado con FFT a favor del equipo rival."
+                    data-en="GTFL will use the match rules used by ATF as a reference. When a goal is awarded by the referee, it will be considered valid provided there was no prior infringement that invalidates the play. Each team will have a maximum of 3 substitutions during regular time. In extra time, each team will have 1 additional substitution. A substituted player may not return to the pitch during the same match. Players sent off with a red card may not continue participating in the match. All players must respect the established kickoff procedure. A minimum of 5 players per team is required to start a match. The server access code will be shared between 20 and 10 minutes before the scheduled match time. Once the official match time has arrived, a maximum waiting period of 10 minutes will be granted for players to join. If a team does not reach the required minimum number of players within this period, an FFT may be awarded to the opposing team.">
                     La GTFL seguirá como referencia las reglas de partido utilizadas por ATF.
                     <br><br>
                     Cuando un gol sea concedido por el árbitro, será considerado válido siempre que no exista una infracción previa que invalide la jugada.
@@ -735,13 +916,17 @@
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 12
-                </div>
+                <div class="article-number">ARTÍCULO 12</div>
 
-                <h4>Árbitros</h4>
+                <h4
+                    data-es="Árbitros"
+                    data-en="Referees">
+                    Árbitros
+                </h4>
 
-                <p>
+                <p
+                    data-es="Los árbitros deberán conocer y utilizar correctamente los comandos y sistemas necesarios para desempeñar su función. Los árbitros que desarrollen correctamente su trabajo podrán recibir recompensas por parte de la organización. Los resultados deberán ser enviados dentro del plazo establecido. Los árbitros dispondrán de un máximo de 2 días para completar y subir los resultados correspondientes. El incumplimiento de estos plazos podrá resultar en una advertencia, sanción o medida disciplinaria superior."
+                    data-en="Referees must know and correctly use the commands and systems required to perform their duties. Referees who perform their work correctly may receive rewards from the organization. Results must be submitted within the established deadline. Referees will have a maximum of 2 days to complete and upload the corresponding results. Failure to meet these deadlines may result in a warning, sanction or further disciplinary action.">
                     Los árbitros deberán conocer y utilizar correctamente los comandos y sistemas necesarios para desempeñar su función.
                     <br><br>
                     Los árbitros que desarrollen correctamente su trabajo podrán recibir <strong>recompensas</strong> por parte de la organización.
@@ -758,13 +943,17 @@
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 13
-                </div>
+                <div class="article-number">ARTÍCULO 13</div>
 
-                <h4>Resultados y actas</h4>
+                <h4
+                    data-es="Resultados y actas"
+                    data-en="Results and Match Reports">
+                    Resultados y actas
+                </h4>
 
-                <p>
+                <p
+                    data-es="Los resultados oficiales deberán registrarse en la web oficial de GTFL en un plazo inferior a 24 horas desde la finalización del encuentro. La publicación correspondiente en Discord deberá realizarse en un plazo máximo de 2 días. Los árbitros deberán informar de cualquier sanción, tarjeta, expulsión o incidencia producida durante el encuentro."
+                    data-en="Official results must be registered on the official GTFL website within 24 hours of the end of the match. The corresponding Discord publication must be made within a maximum of 2 days. Referees must report any sanction, card, sending-off or incident that occurred during the match.">
                     Los resultados oficiales deberán registrarse en la <strong>web oficial de GTFL</strong> en un plazo inferior a <strong>24 horas</strong> desde la finalización del encuentro.
                     <br><br>
                     La publicación correspondiente en Discord deberá realizarse en un plazo máximo de <strong>2 días</strong>.
@@ -783,34 +972,68 @@
 
             <div class="section-heading">
                 <span class="section-number">05</span>
-                <h3>CONDUCTA</h3>
+
+                <h3
+                    data-es="CONDUCTA"
+                    data-en="CONDUCT">
+                    CONDUCTA
+                </h3>
             </div>
 
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 14
-                </div>
+                <div class="article-number">ARTÍCULO 14</div>
 
-                <h4>Conducta de los participantes</h4>
+                <h4
+                    data-es="Conducta de los participantes"
+                    data-en="Participant Conduct">
+                    Conducta de los participantes
+                </h4>
 
-                <p>
+                <p
+                    data-es="Los participantes deberán mantener una conducta adecuada durante los encuentros. Las faltas de respeto u otras conductas ofensivas podrán ser sancionadas mediante advertencia, tarjeta amarilla, tarjeta roja u otras medidas disciplinarias en casos graves o reiterados. Todos los participantes deberán respetar las normas de la competición y las decisiones arbitrales."
+                    data-en="Participants must maintain appropriate conduct during matches. Disrespectful or otherwise offensive behavior may be sanctioned with a warning, yellow card, red card or other disciplinary measures in serious or repeated cases. All participants must respect the competition rules and refereeing decisions.">
                     Los participantes deberán mantener una conducta adecuada durante los encuentros.
                     <br><br>
                     Las faltas de respeto u otras conductas ofensivas podrán ser sancionadas mediante:
                 </p>
 
                 <ul>
-                    <li>Advertencia.</li>
-                    <li>Tarjeta amarilla.</li>
-                    <li>Tarjeta roja.</li>
-                    <li>Otras medidas disciplinarias en casos graves o reiterados.</li>
+                    <li
+                        data-es="Advertencia."
+                        data-en="Warning.">
+                        Advertencia.
+                    </li>
+
+                    <li
+                        data-es="Tarjeta amarilla."
+                        data-en="Yellow card.">
+                        Tarjeta amarilla.
+                    </li>
+
+                    <li
+                        data-es="Tarjeta roja."
+                        data-en="Red card.">
+                        Tarjeta roja.
+                    </li>
+
+                    <li
+                        data-es="Otras medidas disciplinarias en casos graves o reiterados."
+                        data-en="Other disciplinary measures in serious or repeated cases.">
+                        Otras medidas disciplinarias en casos graves o reiterados.
+                    </li>
                 </ul>
 
                 <p>
                     <br>
-                    Todos los participantes deberán respetar las normas de la competición y las decisiones arbitrales.
+
+                    <span
+                        data-es="Todos los participantes deberán respetar las normas de la competición y las decisiones arbitrales."
+                        data-en="All participants must respect the competition rules and refereeing decisions.">
+                        Todos los participantes deberán respetar las normas de la competición y las decisiones arbitrales.
+                    </span>
+
                 </p>
 
             </article>
@@ -818,13 +1041,17 @@
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 15
-                </div>
+                <div class="article-number">ARTÍCULO 15</div>
 
-                <h4>Abuso y acoso</h4>
+                <h4
+                    data-es="Abuso y acoso"
+                    data-en="Abuse and Harassment">
+                    Abuso y acoso
+                </h4>
 
-                <p>
+                <p
+                    data-es="No se permitirá el abuso, acoso o comportamiento gravemente ofensivo hacia otros participantes. Los casos que presenten una gravedad considerable deberán ser comunicados mediante ticket para que puedan ser revisados por la organización."
+                    data-en="Abuse, harassment or seriously offensive behavior towards other participants will not be permitted. Serious cases should be reported through a ticket so they can be reviewed by the organization.">
                     No se permitirá el abuso, acoso o comportamiento gravemente ofensivo hacia otros participantes.
                     <br><br>
                     Los casos que presenten una gravedad considerable deberán ser comunicados mediante <strong>ticket</strong> para que puedan ser revisados por la organización.
@@ -835,13 +1062,17 @@
 
             <article class="article">
 
-                <div class="article-number">
-                    ARTÍCULO 16
-                </div>
+                <div class="article-number">ARTÍCULO 16</div>
 
-                <h4>Trampas y exploits</h4>
+                <h4
+                    data-es="Trampas y exploits"
+                    data-en="Cheating and Exploits">
+                    Trampas y exploits
+                </h4>
 
-                <p>
+                <p
+                    data-es="La GTFL utilizará como referencia las normas y sanciones aplicables de ATF, debido a que la competición utilizará la Match Pitch de ATF. No se tomarán automáticamente como referencia las sanciones de otras ligas. El uso de exploits, trampas, bugs o cualquier método destinado a obtener una ventaja injusta podrá ser sancionado de acuerdo con las normas aplicables de ATF y las decisiones de la organización GTFL."
+                    data-en="GTFL will use the applicable ATF rules and sanctions as a reference because the competition will use the ATF Match Pitch. Sanctions from other leagues will not automatically be used as a reference. The use of exploits, cheats, bugs or any method intended to gain an unfair advantage may be sanctioned according to the applicable ATF rules and decisions of the GTFL organization.">
                     La GTFL utilizará como referencia las normas y sanciones aplicables de <strong>ATF</strong>, debido a que la competición utilizará la <strong>Match Pitch de ATF</strong>.
                     <br><br>
                     No se tomarán automáticamente como referencia las sanciones de otras ligas.
@@ -861,6 +1092,49 @@
 <footer class="footer">
     GTFL — GLORY TOUCH FOOTBALL LEAGUE
 </footer>
+
+
+<script>
+
+function setLanguage(language) {
+
+    const elements = document.querySelectorAll("[data-es][data-en]");
+
+    elements.forEach(element => {
+
+        const text = element.getAttribute("data-" + language);
+
+        if (text) {
+            element.textContent = text;
+        }
+
+    });
+
+    document.documentElement.lang = language;
+
+    document.getElementById("esButton").classList.toggle(
+        "active",
+        language === "es"
+    );
+
+    document.getElementById("enButton").classList.toggle(
+        "active",
+        language === "en"
+    );
+
+    localStorage.setItem("gtfl-language", language);
+}
+
+
+const savedLanguage = localStorage.getItem("gtfl-language");
+
+if (savedLanguage === "en") {
+    setLanguage("en");
+} else {
+    setLanguage("es");
+}
+
+</script>
 
 </body>
 </html>
