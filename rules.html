@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>GTFL | Reglamento Oficial</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            color: #fff;
+            min-height: 100vh;
+
+            background:
+                linear-gradient(
+                    rgba(5, 5, 5, 0.82),
+                    rgba(5, 5, 5, 0.92)
+                ),
+                url("background.jpg") center center / cover fixed no-repeat;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            width: 100%;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(14px);
+        }
+
+        .header-inner {
+            max-width: 1250px;
+            margin: auto;
+            padding: 20px 30px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand img {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        .brand-text h1 {
+            font-size: 20px;
+            letter-spacing: 2px;
+        }
+
+        .brand-text p {
+            margin-top: 4px;
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            opacity: 0.5;
+        }
+
+        .home-button {
+            color: white;
+            text-decoration: none;
+
+            padding: 10px 18px;
+
+            border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 7px;
+
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+
+            background: rgba(255,255,255,0.06);
+
+            transition: 0.2s ease;
+        }
+
+        .home-button:hover {
+            background: rgba(255,255,255,0.13);
+        }
+
+        /* =========================
+           LAYOUT
+        ========================= */
+
+        .layout {
+            max-width: 1250px;
+            margin: auto;
+            padding: 55px 30px 80px;
+
+            display: grid;
+            grid-template-columns: 270px 1fr;
+            gap: 45px;
+            align-items: start;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            position: sticky;
+            top: 25px;
+
+            padding: 22px;
+
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+
+            background: rgba(0,0,0,0.38);
+            backdrop-filter: blur(12px);
+        }
+
+        .sidebar-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            opacity: 0.45;
+
+            margin-bottom: 18px;
+        }
+
+        .sidebar a {
+            display: block;
+
+            padding: 13px 12px;
+
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+
+            border-left: 2px solid transparent;
+
+            font-size: 13px;
+            line-height: 1.4;
+
+            transition: 0.2s ease;
+        }
+
+        .sidebar a:hover {
+            color: white;
+            background: rgba(255,255,255,0.06);
+            border-left-color: white;
+        }
+
+        .sidebar-number {
+            display: block;
+
+            margin-bottom: 3px;
+
+            font-size: 9px;
+            letter-spacing: 1.5px;
+            opacity: 0.4;
+        }
+
+        /* =========================
+           CONTENT HEADER
+        ========================= */
+
+        .content-header {
+            margin-bottom: 45px;
+        }
+
+        .content-header .small-title {
+            font-size: 11px;
+            letter-spacing: 3px;
+            opacity: 0.4;
+            margin-bottom: 12px;
+        }
+
+        .content-header h2 {
+            font-size: 38px;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .content-header p {
+            max-width: 720px;
+
+            font-size: 14px;
+            line-height: 1.8;
+            opacity: 0.55;
+        }
+
+        /* =========================
+           SECTIONS
+        ========================= */
+
+        .regulation-section {
+            margin-bottom: 42px;
+            scroll-margin-top: 30px;
+        }
+
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+
+            padding-bottom: 16px;
+            margin-bottom: 5px;
+
+            border-bottom: 1px solid rgba(255,255,255,0.16);
+        }
+
+        .section-number {
+            font-size: 12px;
+            letter-spacing: 2px;
+            opacity: 0.4;
+        }
+
+        .section-heading h3 {
+            font-size: 21px;
+            letter-spacing: 1px;
+        }
+
+        /* =========================
+           ARTICLES
+        ========================= */
+
+        .article {
+            padding: 27px 5px;
+
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+
+            scroll-margin-top: 30px;
+        }
+
+        .article:last-child {
+            border-bottom: none;
+        }
+
+        .article-number {
+            margin-bottom: 8px;
+
+            font-size: 10px;
+            letter-spacing: 1.5px;
+            opacity: 0.35;
+        }
+
+        .article h4 {
+            margin-bottom: 13px;
+
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .article p {
+            font-size: 14px;
+            line-height: 1.85;
+            color: rgba(255,255,255,0.68);
+        }
+
+        .article strong {
+            color: rgba(255,255,255,0.92);
+        }
+
+        .article ul {
+            margin: 15px 0 0 20px;
+        }
+
+        .article li {
+            margin-bottom: 8px;
+
+            font-size: 14px;
+            line-height: 1.7;
+
+            color: rgba(255,255,255,0.68);
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            max-width: 1250px;
+            margin: auto;
+
+            padding: 25px 30px 45px;
+
+            border-top: 1px solid rgba(255,255,255,0.1);
+
+            text-align: center;
+
+            font-size: 10px;
+            letter-spacing: 2px;
+            opacity: 0.35;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 850px) {
+
+            .header-inner {
+                padding: 18px 20px;
+            }
+
+            .layout {
+                display: block;
+                padding: 35px 20px 60px;
+            }
+
+            .sidebar {
+                position: relative;
+                top: auto;
+
+                margin-bottom: 45px;
+            }
+
+            .sidebar a {
+                display: inline-block;
+                width: 49%;
+            }
+
+            .content-header h2 {
+                font-size: 30px;
+            }
+        }
+
+        @media (max-width: 500px) {
+
+            .brand-text h1 {
+                font-size: 16px;
+            }
+
+            .brand-text p {
+                font-size: 8px;
+            }
+
+            .brand img {
+                width: 45px;
+                height: 45px;
+            }
+
+            .home-button {
+                padding: 8px 11px;
+                font-size: 10px;
+            }
+
+            .sidebar a {
+                width: 100%;
+            }
+
+            .content-header h2 {
+                font-size: 27px;
+            }
+
+            .section-heading h3 {
+                font-size: 18px;
+            }
+
+            .article h4 {
+                font-size: 15px;
+            }
+
+            .article p,
+            .article li {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="header">
+
+    <div class="header-inner">
+
+        <div class="brand">
+
+            <img src="logo.png" alt="GTFL Logo">
+
+            <div class="brand-text">
+                <h1>GTFL</h1>
+                <p>GLORY TOUCH FOOTBALL LEAGUE</p>
+            </div>
+
+        </div>
+
+        <a href="index.html" class="home-button">
+            INICIO
+        </a>
+
+    </div>
+
+</header>
+
+
+<main class="layout">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <div class="sidebar-title">
+            REGLAMENTO
+        </div>
+
+        <a href="#normas">
+            <span class="sidebar-number">01</span>
+            Normas Generales
+        </a>
+
+        <a href="#cuentas">
+            <span class="sidebar-number">02</span>
+            Cuentas y Seguridad
+        </a>
+
+        <a href="#clubes">
+            <span class="sidebar-number">03</span>
+            Clubes y Jugadores
+        </a>
+
+        <a href="#partidos">
+            <span class="sidebar-number">04</span>
+            Partidos
+        </a>
+
+        <a href="#conducta">
+            <span class="sidebar-number">05</span>
+            Conducta
+        </a>
+
+    </aside>
+
+
+    <!-- CONTENT -->
+
+    <section class="content">
+
+        <div class="content-header">
+
+            <div class="small-title">
+                DOCUMENTACIÓN OFICIAL
+            </div>
+
+            <h2>Reglamento Oficial</h2>
+
+            <p>
+                Normativa oficial de la Glory Touch Football League.
+                Este reglamento establece las normas de participación,
+                competición, conducta y funcionamiento de la liga.
+            </p>
+
+        </div>
+
+
+        <!-- 01 -->
+
+        <section class="regulation-section" id="normas">
+
+            <div class="section-heading">
+                <span class="section-number">01</span>
+                <h3>NORMAS GENERALES</h3>
+            </div>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 01
+                </div>
+
+                <h4>Aplicación del reglamento</h4>
+
+                <p>
+                    Cualquier incumplimiento de las normas establecidas por la GTFL podrá conllevar sanciones disciplinarias.
+                    <br><br>
+                    Las infracciones especialmente graves, como amenazas de muerte, acoso grave, filtración de información privada, publicación de IPs, doxxing, publicación de contenido pornográfico, NSFW, gore o CP, podrán resultar en un <strong>baneo permanente</strong> de la comunidad.
+                    <br><br>
+                    La publicación de fotografías de otras personas únicamente estará permitida cuando exista <strong>consentimiento de la persona afectada</strong>. La difusión de fotografías privadas sin consentimiento podrá ser sancionada.
+                </p>
+
+            </article>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 02
+                </div>
+
+                <h4>Autoridad de la competición</h4>
+
+                <p>
+                    La GTFL tomará como referencia gran parte del reglamento utilizado por <strong>ATF</strong>, adaptándolo a las necesidades y funcionamiento de Glory Touch Football League.
+                    <br><br>
+                    En aquellas situaciones no contempladas específicamente por este reglamento, la organización podrá tomar una decisión basándose en los criterios y normas aplicables de ATF.
+                </p>
+
+            </article>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 03
+                </div>
+
+                <h4>Cumplimiento de las normas</h4>
+
+                <p>
+                    El desconocimiento de una norma no exime de su cumplimiento.
+                    <br><br>
+                    El incumplimiento de cualquier norma podrá conllevar advertencias, sanciones, suspensiones, expulsiones o baneos dependiendo de la gravedad de la infracción.
+                </p>
+
+            </article>
+
+        </section>
+
+
+        <!-- 02 -->
+
+        <section class="regulation-section" id="cuentas">
+
+            <div class="section-heading">
+                <span class="section-number">02</span>
+                <h3>CUENTAS Y SEGURIDAD</h3>
+            </div>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 04
+                </div>
+
+                <h4>Cuenta registrada</h4>
+
+                <p>
+                    Los jugadores únicamente podrán disputar partidos oficiales utilizando la cuenta que tengan registrada y verificada mediante <strong>Double Counter y Bloxlink</strong>.
+                    <br><br>
+                    Si un jugador participa en un partido oficial utilizando una cuenta diferente a la registrada, el encuentro podrá ser declarado <strong>FFT a favor del equipo rival</strong>.
+                </p>
+
+            </article>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 05
+                </div>
+
+                <h4>Alt Accounts</h4>
+
+                <p>
+                    No está permitido utilizar cuentas alternativas para disputar partidos oficiales, obtener ventajas competitivas o evitar sanciones.
+                    <br><br>
+                    El uso de una cuenta alternativa podrá conllevar una sanción disciplinaria.
+                </p>
+
+            </article>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 06
+                </div>
+
+                <h4>Account Sharing</h4>
+
+                <p>
+                    El intercambio o préstamo de cuentas entre usuarios estará prohibido.
+                    <br><br>
+                    El <strong>Account Sharing</strong> podrá resultar en una <strong>multa económica y un baneo permanente</strong>, dependiendo de las circunstancias del caso.
+                </p>
+
+            </article>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 07
+                </div>
+
+                <h4>Double Counter</h4>
+
+                <p>
+                    Todo jugador deberá estar verificado mediante <strong>Double Counter</strong> para poder participar en partidos oficiales.
+                    <br><br>
+                    Un jugador que no cumpla con la verificación requerida no podrá disputar el encuentro.
+                    <br><br>
+                    Si participa igualmente, el partido podrá ser declarado <strong>FFT a favor del equipo rival</strong>.
+                </p>
+
+            </article>
+
+        </section>
+
+
+        <!-- 03 -->
+
+        <section class="regulation-section" id="clubes">
+
+            <div class="section-heading">
+                <span class="section-number">03</span>
+                <h3>CLUBES Y JUGADORES</h3>
+            </div>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 08
+                </div>
+
+                <h4>Inscripción</h4>
+
+                <p>
+                    Los clubes interesados en participar en la GTFL deberán realizar su inscripción mediante los sistemas de postulación habilitados por la organización, incluyendo tickets o formularios de postulación cuando estos estén disponibles.
+                </p>
+
+            </article>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 09
+                </div>
+
+                <h4>Plantillas</h4>
+
+                <p>
+                    Las plantillas de la GTFL tendrán un máximo de <strong>12 jugadores</strong>.
+                    <br><br>
+                    Una vez alcanzado el límite establecido, no podrán añadirse nuevos jugadores a la Squad Sheet hasta que exista una plaza disponible.
+                </p>
+
+            </article>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 10
+                </div>
+
+                <h4>Transferencias</h4>
+
+                <p>
+                    Los fichajes podrán realizarse mediante el sistema oficial de <strong>GTFL Bot</strong>.
+                    <br><br>
+                    El equipo interesado podrá enviar una oferta al jugador mediante el sistema correspondiente.
+                    <br><br>
+                    Los releases podrán realizarse por causas como:
+                </p>
+
+                <ul>
+                    <li>Baneo.</li>
+                    <li>Force Release.</li>
+                    <li>Otras causas contempladas por la organización.</li>
+                </ul>
+
+                <p>
+                    <br>
+                    El <strong>Force Release tendrá un coste de 29 Robux</strong>.
+                    <br><br>
+                    También podrán existir transferencias económicas entre clubes cuando estas se realicen mediante los sistemas y condiciones establecidos por la GTFL.
+                </p>
+
+            </article>
+
+        </section>
+
+
+        <!-- 04 -->
+
+        <section class="regulation-section" id="partidos">
+
+            <div class="section-heading">
+                <span class="section-number">04</span>
+                <h3>PARTIDOS</h3>
+            </div>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 11
+                </div>
+
+                <h4>Desarrollo del partido</h4>
+
+                <p>
+                    La GTFL seguirá como referencia las reglas de partido utilizadas por ATF.
+                    <br><br>
+                    Cuando un gol sea concedido por el árbitro, será considerado válido siempre que no exista una infracción previa que invalide la jugada.
+                    <br><br>
+                    Cada equipo dispondrá de un máximo de <strong>3 sustituciones</strong> durante el tiempo reglamentario.
+                    <br><br>
+                    En caso de tiempo extra, cada equipo dispondrá de <strong>1 sustitución adicional</strong>.
+                    <br><br>
+                    Un jugador sustituido no podrá volver a entrar al terreno de juego durante el mismo partido.
+                    <br><br>
+                    Los jugadores expulsados mediante tarjeta roja no podrán continuar participando en el encuentro.
+                    <br><br>
+                    Todos los jugadores deberán respetar el procedimiento establecido para el <strong>saque inicial</strong>.
+                    <br><br>
+                    El mínimo necesario para comenzar un partido será de <strong>5 jugadores por equipo</strong>.
+                    <br><br>
+                    El código de acceso al servidor será compartido entre <strong>20 y 10 minutos antes</strong> de la hora programada del encuentro.
+                    <br><br>
+                    Una vez llegada la hora oficial del partido, se concederá un máximo de <strong>10 minutos de espera</strong> para que los jugadores puedan incorporarse.
+                    <br><br>
+                    Si un equipo no alcanza el mínimo de jugadores necesario dentro de dicho plazo, podrá ser sancionado con <strong>FFT a favor del equipo rival</strong>.
+                </p>
+
+            </article>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 12
+                </div>
+
+                <h4>Árbitros</h4>
+
+                <p>
+                    Los árbitros deberán conocer y utilizar correctamente los comandos y sistemas necesarios para desempeñar su función.
+                    <br><br>
+                    Los árbitros que desarrollen correctamente su trabajo podrán recibir <strong>recompensas</strong> por parte de la organización.
+                    <br><br>
+                    Los resultados deberán ser enviados dentro del plazo establecido.
+                    <br><br>
+                    Los árbitros dispondrán de un máximo de <strong>2 días</strong> para completar y subir los resultados correspondientes.
+                    <br><br>
+                    El incumplimiento de estos plazos podrá resultar en una advertencia, sanción o medida disciplinaria superior.
+                </p>
+
+            </article>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 13
+                </div>
+
+                <h4>Resultados y actas</h4>
+
+                <p>
+                    Los resultados oficiales deberán registrarse en la <strong>web oficial de GTFL</strong> en un plazo inferior a <strong>24 horas</strong> desde la finalización del encuentro.
+                    <br><br>
+                    La publicación correspondiente en Discord deberá realizarse en un plazo máximo de <strong>2 días</strong>.
+                    <br><br>
+                    Los árbitros deberán informar de cualquier sanción, tarjeta, expulsión o incidencia producida durante el encuentro.
+                </p>
+
+            </article>
+
+        </section>
+
+
+        <!-- 05 -->
+
+        <section class="regulation-section" id="conducta">
+
+            <div class="section-heading">
+                <span class="section-number">05</span>
+                <h3>CONDUCTA</h3>
+            </div>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 14
+                </div>
+
+                <h4>Conducta de los participantes</h4>
+
+                <p>
+                    Los participantes deberán mantener una conducta adecuada durante los encuentros.
+                    <br><br>
+                    Las faltas de respeto u otras conductas ofensivas podrán ser sancionadas mediante:
+                </p>
+
+                <ul>
+                    <li>Advertencia.</li>
+                    <li>Tarjeta amarilla.</li>
+                    <li>Tarjeta roja.</li>
+                    <li>Otras medidas disciplinarias en casos graves o reiterados.</li>
+                </ul>
+
+                <p>
+                    <br>
+                    Todos los participantes deberán respetar las normas de la competición y las decisiones arbitrales.
+                </p>
+
+            </article>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 15
+                </div>
+
+                <h4>Abuso y acoso</h4>
+
+                <p>
+                    No se permitirá el abuso, acoso o comportamiento gravemente ofensivo hacia otros participantes.
+                    <br><br>
+                    Los casos que presenten una gravedad considerable deberán ser comunicados mediante <strong>ticket</strong> para que puedan ser revisados por la organización.
+                </p>
+
+            </article>
+
+
+            <article class="article">
+
+                <div class="article-number">
+                    ARTÍCULO 16
+                </div>
+
+                <h4>Trampas y exploits</h4>
+
+                <p>
+                    La GTFL utilizará como referencia las normas y sanciones aplicables de <strong>ATF</strong>, debido a que la competición utilizará la <strong>Match Pitch de ATF</strong>.
+                    <br><br>
+                    No se tomarán automáticamente como referencia las sanciones de otras ligas.
+                    <br><br>
+                    El uso de exploits, trampas, bugs o cualquier método destinado a obtener una ventaja injusta podrá ser sancionado de acuerdo con las normas aplicables de ATF y las decisiones de la organización GTFL.
+                </p>
+
+            </article>
+
+        </section>
+
+    </section>
+
+</main>
+
+
+<footer class="footer">
+    GTFL — GLORY TOUCH FOOTBALL LEAGUE
+</footer>
+
+</body>
+</html>
