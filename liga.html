@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>GTFL | Liga</title>
+    <title>GTFL | Competiciones</title>
 
     <style>
         * {
@@ -21,7 +21,7 @@
             background:
                 linear-gradient(
                     rgba(0, 0, 0, 0.68),
-                    rgba(0, 0, 0, 0.86)
+                    rgba(0, 0, 0, 0.88)
                 ),
                 url("background.jpg") center center / cover fixed no-repeat;
         }
@@ -39,14 +39,14 @@
 
         .header {
             text-align: center;
-            margin-bottom: 35px;
+            margin-bottom: 25px;
         }
 
-        .league-logo {
-            width: 115px;
-            height: 115px;
+        .gtfl-logo {
+            width: 105px;
+            height: 105px;
             object-fit: contain;
-            margin-bottom: 15px;
+            margin-bottom: 14px;
         }
 
         .title {
@@ -59,11 +59,11 @@
             margin-top: 8px;
             font-size: 13px;
             letter-spacing: 2px;
-            opacity: 0.55;
+            opacity: 0.5;
         }
 
         /* =========================
-           NAV
+           BACK
         ========================= */
 
         .top-nav {
@@ -94,6 +94,90 @@
         }
 
         /* =========================
+           COMPETITIONS
+        ========================= */
+
+        .competitions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+
+            margin-bottom: 30px;
+        }
+
+        .competition {
+            min-height: 165px;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+
+            padding: 20px;
+
+            cursor: pointer;
+
+            background: rgba(255,255,255,0.055);
+
+            border: 1px solid rgba(255,255,255,0.12);
+
+            border-radius: 12px;
+
+            transition:
+                transform 0.2s ease,
+                background 0.2s ease,
+                border-color 0.2s ease;
+        }
+
+        .competition:hover {
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.10);
+        }
+
+        .competition.active {
+            background: rgba(255,255,255,0.14);
+            border-color: rgba(255,255,255,0.4);
+        }
+
+        .competition-logo {
+            width: 70px;
+            height: 70px;
+
+            object-fit: contain;
+
+            margin-bottom: 12px;
+        }
+
+        .competition-name {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: 1.3px;
+        }
+
+        .competition-status {
+            margin-top: 7px;
+
+            font-size: 9px;
+            letter-spacing: 0.8px;
+
+            opacity: 0.45;
+        }
+
+        /* =========================
+           COMPETITION CONTENT
+        ========================= */
+
+        .competition-content {
+            display: none;
+        }
+
+        .competition-content.active {
+            display: block;
+        }
+
+        /* =========================
            TABS
         ========================= */
 
@@ -108,6 +192,7 @@
 
         .tab {
             border: 1px solid rgba(255,255,255,0.16);
+
             background: rgba(255,255,255,0.06);
 
             color: white;
@@ -122,15 +207,12 @@
 
             cursor: pointer;
 
-            transition:
-                background 0.2s,
-                transform 0.2s,
-                border-color 0.2s;
+            transition: 0.2s;
         }
 
         .tab:hover {
-            transform: translateY(-2px);
             background: rgba(255,255,255,0.12);
+            transform: translateY(-2px);
         }
 
         .tab.active {
@@ -139,13 +221,14 @@
         }
 
         /* =========================
-           CONTENT
+           SECTIONS
         ========================= */
 
         .section {
             display: none;
 
             background: rgba(0,0,0,0.38);
+
             border: 1px solid rgba(255,255,255,0.1);
 
             border-radius: 12px;
@@ -220,7 +303,7 @@
         }
 
         tbody tr {
-            transition: background 0.2s;
+            transition: 0.15s;
         }
 
         tbody tr:hover {
@@ -257,30 +340,38 @@
         ========================= */
 
         .matchday {
-            margin-bottom: 28px;
+            margin-bottom: 30px;
         }
 
         .matchday-title {
             font-size: 15px;
             font-weight: 700;
 
-            padding-bottom: 12px;
-            margin-bottom: 10px;
+            padding-bottom: 7px;
 
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
+        .matchday-date {
+            font-size: 11px;
+            opacity: 0.45;
+
+            margin: 7px 0 12px;
+        }
+
         .fixture {
             display: grid;
+
             grid-template-columns: 1fr 70px 1fr;
 
             align-items: center;
 
-            padding: 15px;
+            padding: 14px;
 
             margin-bottom: 8px;
 
             background: rgba(255,255,255,0.04);
+
             border: 1px solid rgba(255,255,255,0.06);
 
             border-radius: 8px;
@@ -297,15 +388,18 @@
 
         .team.home {
             justify-content: flex-end;
+            text-align: right;
         }
 
         .team.away {
             justify-content: flex-start;
+            text-align: left;
         }
 
         .fixture-logo {
             width: 30px;
             height: 30px;
+
             object-fit: contain;
         }
 
@@ -323,8 +417,7 @@
         .stats-grid {
             display: grid;
 
-            grid-template-columns:
-                repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2, 1fr);
 
             gap: 15px;
         }
@@ -350,31 +443,56 @@
         }
 
         /* =========================
+           PENDING
+        ========================= */
+
+        .pending {
+            min-height: 330px;
+
+            display: flex;
+            flex-direction: column;
+
+            align-items: center;
+            justify-content: center;
+
+            text-align: center;
+        }
+
+        .pending-logo {
+            width: 110px;
+            height: 110px;
+
+            object-fit: contain;
+
+            margin-bottom: 20px;
+        }
+
+        .pending h2 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .pending p {
+            font-size: 13px;
+            opacity: 0.5;
+        }
+
+        /* =========================
            MOBILE
         ========================= */
 
-        @media (max-width: 700px) {
+        @media (max-width: 750px) {
 
-            .page {
-                padding: 25px 12px 45px;
-            }
-
-            .title {
-                font-size: 25px;
-                letter-spacing: 2px;
-            }
-
-            .league-logo {
-                width: 90px;
-                height: 90px;
-            }
-
-            .section {
-                padding: 15px;
+            .competitions {
+                grid-template-columns: 1fr;
             }
 
             .stats-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .section {
+                padding: 15px;
             }
 
             .fixture {
@@ -385,10 +503,24 @@
             .team.home,
             .team.away {
                 justify-content: center;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 600px) {
+
+            .page {
+                padding: 25px 12px 45px;
             }
 
-            .vs {
-                order: 2;
+            .title {
+                font-size: 25px;
+                letter-spacing: 2px;
+            }
+
+            .gtfl-logo {
+                width: 85px;
+                height: 85px;
             }
         }
     </style>
@@ -396,61 +528,153 @@
 
 <body>
 
-    <main class="page">
+<main class="page">
 
-        <!-- HEADER -->
+    <!-- =========================
+         HEADER
+    ========================= -->
 
-        <header class="header">
+    <header class="header">
+
+        <img
+            src="logo.png"
+            class="gtfl-logo"
+            alt="GTFL"
+        >
+
+        <h1 class="title">
+            GLORY TOUCH FOOTBALL LEAGUE
+        </h1>
+
+        <p class="subtitle">
+            TEMPORADA 1
+        </p>
+
+    </header>
+
+
+    <!-- =========================
+         VOLVER
+    ========================= -->
+
+    <div class="top-nav">
+
+        <a href="index.html" class="back">
+            ← VOLVER
+        </a>
+
+    </div>
+
+
+    <!-- =========================
+         COMPETICIONES
+    ========================= -->
+
+    <div class="competitions">
+
+        <!-- COPA GTFL -->
+
+        <div
+            class="competition active"
+            onclick="selectCompetition('copa-gtfl', this)"
+        >
 
             <img
-                src="logo.png"
-                class="league-logo"
-                alt="GTFL"
+                src="copagtfl.png"
+                class="competition-logo"
+                alt="Copa GTFL"
             >
 
-            <h1 class="title">
-                GLORY TOUCH FOOTBALL LEAGUE
-            </h1>
+            <div class="competition-name">
+                COPA GTFL
+            </div>
 
-            <p class="subtitle">
+            <div class="competition-status">
                 TEMPORADA 1
-            </p>
-
-        </header>
-
-
-        <!-- VOLVER -->
-
-        <div class="top-nav">
-
-            <a href="index.html" class="back">
-                ← VOLVER
-            </a>
+            </div>
 
         </div>
 
 
-        <!-- TABS -->
+        <!-- COPA DEVILS -->
+
+        <div
+            class="competition"
+            onclick="selectCompetition('copa-devils', this)"
+        >
+
+            <img
+                src="copadevils.png"
+                class="competition-logo"
+                alt="Copa Devils"
+            >
+
+            <div class="competition-name">
+                COPA DEVILS
+            </div>
+
+            <div class="competition-status">
+                PENDIENTE DE SORTEO
+            </div>
+
+        </div>
+
+
+        <!-- RECOPA GTFL -->
+
+        <div
+            class="competition"
+            onclick="selectCompetition('recopa-gtfl', this)"
+        >
+
+            <img
+                src="recopagtfl.png"
+                class="competition-logo"
+                alt="Recopa GTFL"
+            >
+
+            <div class="competition-name">
+                RECOPA GTFL
+            </div>
+
+            <div class="competition-status">
+                PENDIENTE DE RIVALES
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================================
+         COPA GTFL
+         ESTA ES LA LIGA PRINCIPAL
+    ================================================== -->
+
+    <div
+        id="copa-gtfl"
+        class="competition-content active"
+    >
 
         <nav class="tabs">
 
             <button
                 class="tab active"
-                onclick="showSection('positions', this)"
+                onclick="showTab('copa-posiciones', this)"
             >
                 POSICIONES
             </button>
 
             <button
                 class="tab"
-                onclick="showSection('fixtures', this)"
+                onclick="showTab('copa-fixtures', this)"
             >
                 FIXTURES
             </button>
 
             <button
                 class="tab"
-                onclick="showSection('stats', this)"
+                onclick="showTab('copa-estadisticas', this)"
             >
                 ESTADÍSTICAS
             </button>
@@ -463,7 +687,7 @@
         ========================= -->
 
         <section
-            id="positions"
+            id="copa-posiciones"
             class="section active"
         >
 
@@ -472,7 +696,7 @@
             </h2>
 
             <p class="section-description">
-                Clasificación oficial de la GTFL — Temporada 1
+                Copa GTFL · Temporada 1
             </p>
 
             <div class="table-container">
@@ -481,269 +705,189 @@
 
                     <thead>
 
-                        <tr>
-                            <th>#</th>
-                            <th>CLUB</th>
-                            <th>PJ</th>
-                            <th>G</th>
-                            <th>E</th>
-                            <th>P</th>
-                            <th>GF</th>
-                            <th>GC</th>
-                            <th>DG</th>
-                            <th>PTS</th>
-                        </tr>
+                    <tr>
+                        <th>#</th>
+                        <th>CLUB</th>
+                        <th>PJ</th>
+                        <th>G</th>
+                        <th>E</th>
+                        <th>P</th>
+                        <th>GF</th>
+                        <th>GC</th>
+                        <th>DG</th>
+                        <th>PTS</th>
+                    </tr>
 
                     </thead>
 
                     <tbody>
 
-                        <tr>
-
-                            <td class="position">1</td>
-
-                            <td>
-                                <div class="club">
-
-                                    <img
-                                        src="madrid.png"
-                                        class="club-logo"
-                                        alt="Madrid"
-                                    >
-
-                                    Madrid
-
-                                </div>
-                            </td>
-
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-
-                            <td class="points">0</td>
-
-                        </tr>
-
-
-                        <tr>
-
-                            <td class="position">2</td>
-
-                            <td>
-                                <div class="club">
-
-                                    <img
-                                        src="barcelona.png"
-                                        class="club-logo"
-                                        alt="Barcelona"
-                                    >
-
-                                    Barcelona
-
-                                </div>
-                            </td>
-
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-
-                            <td class="points">0</td>
-
-                        </tr>
-
-
-                        <tr>
-
-                            <td class="position">3</td>
-
-                            <td>
-                                <div class="club">
-
-                                    <img
-                                        src="athletic.png"
-                                        class="club-logo"
-                                        alt="Athletic Bilbao"
-                                    >
-
-                                    Athletic Bilbao
-
-                                </div>
-                            </td>
-
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-
-                            <td class="points">0</td>
-
-                        </tr>
-
-
-                        <tr>
-
-                            <td class="position">4</td>
-
-                            <td>
-                                <div class="club">
-
-                                    <img
-                                        src="zaragoza.png"
-                                        class="club-logo"
-                                        alt="Zaragoza"
-                                    >
-
-                                    Zaragoza
-
-                                </div>
-                            </td>
-
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-
-                            <td class="points">0</td>
-
-                        </tr>
-
-
-                        <tr>
-
-                            <td class="position">5</td>
-
-                            <td>
-                                <div class="club">
-
-                                    <img
-                                        src="celta.png"
-                                        class="club-logo"
-                                        alt="Celta"
-                                    >
-
-                                    Celta
-
-                                </div>
-                            </td>
-
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-
-                            <td class="points">0</td>
-
-                        </tr>
-
-
-                        <tr>
-
-                            <td class="position">6</td>
-
-                            <td>
-                                <div class="club">
-
-                                    <img
-                                        src="racing.png"
-                                        class="club-logo"
-                                        alt="Racing"
-                                    >
-
-                                    Racing Santander
-
-                                </div>
-                            </td>
-
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-
-                            <td class="points">0</td>
-
-                        </tr>
-
-
-                        <tr>
-
-                            <td class="position">7</td>
-
-                            <td>
-                                <div class="club">
-
-                                    <img
-                                        src="malaga.png"
-                                        class="club-logo"
-                                        alt="Malaga"
-                                    >
-
-                                    Malaga
-
-                                </div>
-                            </td>
-
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-
-                            <td class="points">0</td>
-
-                        </tr>
-
-
-                        <tr>
-
-                            <td class="position">8</td>
-
-                            <td>
-                                <div class="club">
-
-                                    <img
-                                        src="depor.png"
-                                        class="club-logo"
-                                        alt="Depor"
-                                    >
-
-                                    Depor
-
-                                </div>
-                            </td>
-
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-                            <td>0</td>
-
-                            <td class="points">0</td>
-
-                        </tr>
+                    <tr>
+                        <td class="position">1</td>
+
+                        <td>
+                            <div class="club">
+                                <img src="ceuta.png" class="club-logo">
+                                AD Ceuta
+                            </div>
+                        </td>
+
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td class="points">0</td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="position">2</td>
+
+                        <td>
+                            <div class="club">
+                                <img src="athletic.png" class="club-logo">
+                                Athletic Club
+                            </div>
+                        </td>
+
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td class="points">0</td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="position">3</td>
+
+                        <td>
+                            <div class="club">
+                                <img src="barcelona.png" class="club-logo">
+                                FC Barcelona
+                            </div>
+                        </td>
+
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td class="points">0</td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="position">4</td>
+
+                        <td>
+                            <div class="club">
+                                <img src="malaga.png" class="club-logo">
+                                Málaga CF
+                            </div>
+                        </td>
+
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td class="points">0</td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="position">5</td>
+
+                        <td>
+                            <div class="club">
+                                <img src="madrid.png" class="club-logo">
+                                Real Madrid
+                            </div>
+                        </td>
+
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td class="points">0</td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="position">6</td>
+
+                        <td>
+                            <div class="club">
+                                <img src="zaragoza.png" class="club-logo">
+                                Real Zaragoza
+                            </div>
+                        </td>
+
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td class="points">0</td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="position">7</td>
+
+                        <td>
+                            <div class="club">
+                                <img src="depor.png" class="club-logo">
+                                RC Deportivo
+                            </div>
+                        </td>
+
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td class="points">0</td>
+                    </tr>
+
+
+                    <tr>
+                        <td class="position">8</td>
+
+                        <td>
+                            <div class="club">
+                                <img src="racing.png" class="club-logo">
+                                Racing de Santander
+                            </div>
+                        </td>
+
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td class="points">0</td>
+                    </tr>
 
                     </tbody>
 
@@ -759,7 +903,7 @@
         ========================= -->
 
         <section
-            id="fixtures"
+            id="copa-fixtures"
             class="section"
         >
 
@@ -768,9 +912,11 @@
             </h2>
 
             <p class="section-description">
-                Calendario oficial de la Temporada 1
+                Copa GTFL · Temporada 1
             </p>
 
+
+            <!-- JORNADA 1 -->
 
             <div class="matchday">
 
@@ -778,15 +924,16 @@
                     JORNADA 1
                 </div>
 
+                <div class="matchday-date">
+                    03/10/2026
+                </div>
+
 
                 <div class="fixture">
 
                     <div class="team home">
-                        Madrid
-                        <img
-                            src="madrid.png"
-                            class="fixture-logo"
-                        >
+                        AD Ceuta
+                        <img src="ceuta.png" class="fixture-logo">
                     </div>
 
                     <div class="vs">
@@ -794,14 +941,8 @@
                     </div>
 
                     <div class="team away">
-
-                        <img
-                            src="barcelona.png"
-                            class="fixture-logo"
-                        >
-
-                        Barcelona
-
+                        <img src="athletic.png" class="fixture-logo">
+                        Athletic Club
                     </div>
 
                 </div>
@@ -810,11 +951,8 @@
                 <div class="fixture">
 
                     <div class="team home">
-                        Athletic Bilbao
-                        <img
-                            src="athletic.png"
-                            class="fixture-logo"
-                        >
+                        FC Barcelona
+                        <img src="barcelona.png" class="fixture-logo">
                     </div>
 
                     <div class="vs">
@@ -822,14 +960,8 @@
                     </div>
 
                     <div class="team away">
-
-                        <img
-                            src="zaragoza.png"
-                            class="fixture-logo"
-                        >
-
-                        Zaragoza
-
+                        <img src="malaga.png" class="fixture-logo">
+                        Málaga CF
                     </div>
 
                 </div>
@@ -838,11 +970,8 @@
                 <div class="fixture">
 
                     <div class="team home">
-                        Celta
-                        <img
-                            src="celta.png"
-                            class="fixture-logo"
-                        >
+                        Real Madrid
+                        <img src="madrid.png" class="fixture-logo">
                     </div>
 
                     <div class="vs">
@@ -850,14 +979,8 @@
                     </div>
 
                     <div class="team away">
-
-                        <img
-                            src="racing.png"
-                            class="fixture-logo"
-                        >
-
-                        Racing Santander
-
+                        <img src="zaragoza.png" class="fixture-logo">
+                        Real Zaragoza
                     </div>
 
                 </div>
@@ -866,11 +989,8 @@
                 <div class="fixture">
 
                     <div class="team home">
-                        Malaga
-                        <img
-                            src="malaga.png"
-                            class="fixture-logo"
-                        >
+                        RC Deportivo
+                        <img src="depor.png" class="fixture-logo">
                     </div>
 
                     <div class="vs">
@@ -878,20 +998,16 @@
                     </div>
 
                     <div class="team away">
-
-                        <img
-                            src="depor.png"
-                            class="fixture-logo"
-                        >
-
-                        Depor
-
+                        <img src="racing.png" class="fixture-logo">
+                        Racing de Santander
                     </div>
 
                 </div>
 
             </div>
 
+
+            <!-- JORNADA 2 -->
 
             <div class="matchday">
 
@@ -899,29 +1015,23 @@
                     JORNADA 2
                 </div>
 
+                <div class="matchday-date">
+                    09/10/2026
+                </div>
+
+
                 <div class="fixture">
 
                     <div class="team home">
-                        Madrid
-                        <img
-                            src="madrid.png"
-                            class="fixture-logo"
-                        >
+                        AD Ceuta
+                        <img src="ceuta.png" class="fixture-logo">
                     </div>
 
-                    <div class="vs">
-                        VS
-                    </div>
+                    <div class="vs">VS</div>
 
                     <div class="team away">
-
-                        <img
-                            src="athletic.png"
-                            class="fixture-logo"
-                        >
-
-                        Athletic Bilbao
-
+                        <img src="malaga.png" class="fixture-logo">
+                        Málaga CF
                     </div>
 
                 </div>
@@ -930,26 +1040,49 @@
                 <div class="fixture">
 
                     <div class="team home">
-                        Barcelona
-                        <img
-                            src="barcelona.png"
-                            class="fixture-logo"
-                        >
+                        Athletic Club
+                        <img src="athletic.png" class="fixture-logo">
                     </div>
 
-                    <div class="vs">
-                        VS
-                    </div>
+                    <div class="vs">VS</div>
 
                     <div class="team away">
+                        <img src="zaragoza.png" class="fixture-logo">
+                        Real Zaragoza
+                    </div>
 
-                        <img
-                            src="celta.png"
-                            class="fixture-logo"
-                        >
+                </div>
 
-                        Celta
 
+                <div class="fixture">
+
+                    <div class="team home">
+                        FC Barcelona
+                        <img src="barcelona.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="racing.png" class="fixture-logo">
+                        Racing de Santander
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Real Madrid
+                        <img src="madrid.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="depor.png" class="fixture-logo">
+                        RC Deportivo
                     </div>
 
                 </div>
@@ -957,14 +1090,419 @@
             </div>
 
 
-            <p style="
-                text-align:center;
-                font-size:12px;
-                opacity:0.4;
-                margin-top:20px;
-            ">
-                El calendario se actualizará oficialmente cuando se publiquen las jornadas.
-            </p>
+            <!-- JORNADA 3 -->
+
+            <div class="matchday">
+
+                <div class="matchday-title">
+                    JORNADA 3
+                </div>
+
+                <div class="matchday-date">
+                    16/10/2026
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        AD Ceuta
+                        <img src="ceuta.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="zaragoza.png" class="fixture-logo">
+                        Real Zaragoza
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Málaga CF
+                        <img src="malaga.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="racing.png" class="fixture-logo">
+                        Racing de Santander
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Athletic Club
+                        <img src="athletic.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="depor.png" class="fixture-logo">
+                        RC Deportivo
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        FC Barcelona
+                        <img src="barcelona.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="madrid.png" class="fixture-logo">
+                        Real Madrid
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- JORNADA 4 -->
+
+            <div class="matchday">
+
+                <div class="matchday-title">
+                    JORNADA 4
+                </div>
+
+                <div class="matchday-date">
+                    23/10/2026
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        AD Ceuta
+                        <img src="ceuta.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="racing.png" class="fixture-logo">
+                        Racing de Santander
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Real Zaragoza
+                        <img src="zaragoza.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="depor.png" class="fixture-logo">
+                        RC Deportivo
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Málaga CF
+                        <img src="malaga.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="madrid.png" class="fixture-logo">
+                        Real Madrid
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Athletic Club
+                        <img src="athletic.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="barcelona.png" class="fixture-logo">
+                        FC Barcelona
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- JORNADA 5 -->
+
+            <div class="matchday">
+
+                <div class="matchday-title">
+                    JORNADA 5
+                </div>
+
+                <div class="matchday-date">
+                    24/10/2026
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        AD Ceuta
+                        <img src="ceuta.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="depor.png" class="fixture-logo">
+                        RC Deportivo
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Racing de Santander
+                        <img src="racing.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="madrid.png" class="fixture-logo">
+                        Real Madrid
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Real Zaragoza
+                        <img src="zaragoza.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="barcelona.png" class="fixture-logo">
+                        FC Barcelona
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Málaga CF
+                        <img src="malaga.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="athletic.png" class="fixture-logo">
+                        Athletic Club
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- JORNADA 6 -->
+
+            <div class="matchday">
+
+                <div class="matchday-title">
+                    JORNADA 6
+                </div>
+
+                <div class="matchday-date">
+                    30/10/2026
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        AD Ceuta
+                        <img src="ceuta.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="madrid.png" class="fixture-logo">
+                        Real Madrid
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        RC Deportivo
+                        <img src="depor.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="barcelona.png" class="fixture-logo">
+                        FC Barcelona
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Racing de Santander
+                        <img src="racing.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="athletic.png" class="fixture-logo">
+                        Athletic Club
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Real Zaragoza
+                        <img src="zaragoza.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="malaga.png" class="fixture-logo">
+                        Málaga CF
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- JORNADA 7 -->
+
+            <div class="matchday">
+
+                <div class="matchday-title">
+                    JORNADA 7
+                </div>
+
+                <div class="matchday-date">
+                    06/11/2026
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        AD Ceuta
+                        <img src="ceuta.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="barcelona.png" class="fixture-logo">
+                        FC Barcelona
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Real Madrid
+                        <img src="madrid.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="athletic.png" class="fixture-logo">
+                        Athletic Club
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        RC Deportivo
+                        <img src="depor.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="malaga.png" class="fixture-logo">
+                        Málaga CF
+                    </div>
+
+                </div>
+
+
+                <div class="fixture">
+
+                    <div class="team home">
+                        Racing de Santander
+                        <img src="racing.png" class="fixture-logo">
+                    </div>
+
+                    <div class="vs">VS</div>
+
+                    <div class="team away">
+                        <img src="zaragoza.png" class="fixture-logo">
+                        Real Zaragoza
+                    </div>
+
+                </div>
+
+            </div>
 
         </section>
 
@@ -974,7 +1512,7 @@
         ========================= -->
 
         <section
-            id="stats"
+            id="copa-estadisticas"
             class="section"
         >
 
@@ -983,9 +1521,8 @@
             </h2>
 
             <p class="section-description">
-                Estadísticas de la competición
+                Estadísticas de la Copa GTFL · Temporada 1
             </p>
-
 
             <div class="stats-grid">
 
@@ -996,7 +1533,7 @@
                     </h3>
 
                     <p>
-                        Las estadísticas de goleadores aparecerán aquí.
+                        Las estadísticas aparecerán aquí.
                     </p>
 
                 </div>
@@ -1009,7 +1546,7 @@
                     </h3>
 
                     <p>
-                        Las estadísticas de asistencias aparecerán aquí.
+                        Las estadísticas aparecerán aquí.
                     </p>
 
                 </div>
@@ -1022,7 +1559,7 @@
                     </h3>
 
                     <p>
-                        Las tarjetas de los jugadores aparecerán aquí.
+                        Las estadísticas aparecerán aquí.
                     </p>
 
                 </div>
@@ -1035,7 +1572,7 @@
                     </h3>
 
                     <p>
-                        Las estadísticas de porteros aparecerán aquí.
+                        Las estadísticas aparecerán aquí.
                     </p>
 
                 </div>
@@ -1044,30 +1581,145 @@
 
         </section>
 
+    </div>
 
-    </main>
+
+    <!-- ==================================================
+         COPA DEVILS
+    ================================================== -->
+
+    <div
+        id="copa-devils"
+        class="competition-content"
+    >
+
+        <div class="pending">
+
+            <img
+                src="copadevils.png"
+                class="pending-logo"
+                alt="Copa Devils"
+            >
+
+            <h2>
+                COPA DEVILS
+            </h2>
+
+            <p>
+                Pendiente de sorteo
+            </p>
+
+        </div>
+
+    </div>
 
 
-    <script>
+    <!-- ==================================================
+         RECOPA GTFL
+    ================================================== -->
 
-        function showSection(sectionId, button) {
+    <div
+        id="recopa-gtfl"
+        class="competition-content"
+    >
 
-            document.querySelectorAll(".section").forEach(section => {
+        <div class="pending">
+
+            <img
+                src="recopagtfl.png"
+                class="pending-logo"
+                alt="Recopa GTFL"
+            >
+
+            <h2>
+                RECOPA GTFL
+            </h2>
+
+            <p>
+                Pendiente de rivales
+            </p>
+
+        </div>
+
+    </div>
+
+</main>
+
+
+<script>
+
+    /* =========================
+       CAMBIAR COMPETICIÓN
+    ========================= */
+
+    function selectCompetition(id, button) {
+
+        document
+            .querySelectorAll(".competition-content")
+            .forEach(content => {
+
+                content.classList.remove("active");
+
+            });
+
+
+        document
+            .querySelectorAll(".competition")
+            .forEach(competition => {
+
+                competition.classList.remove("active");
+
+            });
+
+
+        document
+            .getElementById(id)
+            .classList.add("active");
+
+
+        button.classList.add("active");
+
+    }
+
+
+    /* =========================
+       CAMBIAR TAB
+    ========================= */
+
+    function showTab(id, button) {
+
+        const parent =
+            button.closest(".competition-content");
+
+
+        parent
+            .querySelectorAll(".section")
+            .forEach(section => {
+
                 section.classList.remove("active");
+
             });
 
-            document.querySelectorAll(".tab").forEach(tab => {
+
+        parent
+            .querySelectorAll(".tab")
+            .forEach(tab => {
+
                 tab.classList.remove("active");
+
             });
 
-            document
-                .getElementById(sectionId)
-                .classList.add("active");
 
-            button.classList.add("active");
-        }
+        document
+            .getElementById(id)
+            .classList.add("active");
 
-    </script>
+
+        button.classList.add("active");
+
+    }
+
+</script>
 
 </body>
 </html>
