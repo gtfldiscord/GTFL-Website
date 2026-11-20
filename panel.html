@@ -7,118 +7,368 @@
 <title>GTFL | Panel Privado</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{min-height:100vh;background:#090d16;color:white;font-family:Arial,sans-serif;padding:25px}
-main{max-width:850px;margin:70px auto;background:#111827;border:1px solid #273449;border-radius:15px;padding:30px}
-h1{color:#60a5fa;margin-bottom:10px}
-p{color:#9ca3af;margin:12px 0 22px}
-button{padding:13px 20px;border:0;border-radius:8px;background:#5865f2;color:white;font-weight:bold;cursor:pointer}
-button:hover{background:#4752c4}
+body{min-height:100vh;background:#090d16;color:white;font-family:Arial,sans-serif;padding:18px}
+main{max-width:1050px;margin:35px auto}
+header,.section{background:#111827;border:1px solid #273449;border-radius:13px;padding:22px;margin-bottom:20px}
+h1{color:#60a5fa;margin-bottom:8px}
+h2{margin-bottom:12px}
+p{color:#9ca3af;margin-top:8px;line-height:1.5}
+button{padding:11px 15px;border:0;border-radius:7px;background:#5865f2;color:white;font-weight:bold;cursor:pointer;margin-top:12px}
+button:hover{filter:brightness(1.12)}
+button:disabled{opacity:.45;cursor:not-allowed}
+input{background:#0b1220;color:white;border:1px solid #374151;border-radius:7px;padding:11px;width:100%;margin-top:8px}
 .hidden{display:none!important}
-#status{margin-top:20px;color:#d1d5db;line-height:1.5}
-.panel-section{background:#1f2937;border-radius:10px;padding:20px;margin-top:20px}
-.logout{background:#374151;margin-top:20px}
+#status{color:#d1d5db;margin-top:15px}
+.jornada{background:#111827;border:1px solid #273449;border-radius:12px;padding:17px;margin:18px 0}
+.jornada h2{color:#60a5fa}
+.partido{background:#1f2937;border-radius:9px;padding:15px;margin-top:12px}
+.teams{font-size:17px;font-weight:bold}
+.meta{font-size:12px;color:#9ca3af;margin-top:7px}
+.state{font-size:13px;color:#fbbf24;margin-top:10px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.actions button{margin-top:5px}
+.secondary{background:#374151}
+.danger{background:#991b1b}
+.success{background:#166534}
+.result-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.report{background:#1f2937;border-radius:9px;padding:15px;margin-top:12px}
+.logout{background:#374151}
+@media(max-width:600px){body{padding:9px}.result-inputs{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <main>
-<h1>GTFL</h1>
-<h2>Panel privado de la liga</h2>
-<p>Acceso exclusivo para árbitros y directiva.</p>
-
-<button id="login">Iniciar sesión con Discord</button>
-<div id="status">Verificando acceso...</div>
+<header>
+  <h1>GTFL</h1>
+  <h2>Panel privado de la liga</h2>
+  <p>Panel exclusivo para árbitros y dirección.</p>
+  <button id="login">Iniciar sesión con Discord</button>
+  <div id="status">Comprobando sesión...</div>
+</header>
 
 <section id="privatePanel" class="hidden">
-  <div class="panel-section">
+  <header>
     <h2>Acceso autorizado</h2>
     <p id="identity"></p>
     <p id="role"></p>
-  </div>
+    <button class="logout" id="logout">Cerrar sesión</button>
+  </header>
 
-  <div id="refereeArea" class="panel-section hidden">
-    <h2>Zona de árbitros</h2>
-    <p>Acceso autorizado para consultar partidos y enviar informes.</p>
-  </div>
+  <section class="section">
+    <h2>Partidos de GTFL</h2>
+    <p>Todos los árbitros autorizados pueden consultar los 28 partidos.</p>
+    <div id="matches">Cargando partidos...</div>
+  </section>
 
-  <div id="adminArea" class="panel-section hidden">
+  <section id="adminArea" class="section hidden">
     <h2>Zona de dirección</h2>
-    <p>Acceso autorizado para gestionar verificaciones.</p>
-  </div>
-
-  <button class="logout" id="logout">Cerrar sesión</button>
+    <p>Revisa los informes y administra los bloqueos.</p>
+    <div id="pendingReports"></div>
+  </section>
 </section>
 </main>
 
 <script type="module">
-import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
+import {createClient} from
+"https://esm.sh/@supabase/supabase-js@2";
 
-const supabase=createClient(
+const supabase = createClient(
   "https://ruusgcicoscnaydsimve.supabase.co",
   "sb_publishable_RjKrgG_mX_XfW9QQGJmJcQ_325gNLq4"
 );
 
-const login=document.getElementById("login");
-const status=document.getElementById("status");
-const privatePanel=document.getElementById("privatePanel");
+const $ = id => document.getElementById(id);
+let currentUser = null;
+let isReferee = false;
+let canApprove = false;
+let currentData = null;
 
-login.addEventListener("click",async()=>{
-  status.textContent="Conectando con Discord...";
-  const {error}=await supabase.auth.signInWithOAuth({
-    provider:"discord",
-    options:{redirectTo:window.location.href}
+async function callPanel(action, extra = {}) {
+  const {data, error} = await supabase.functions.invoke("gtfl-panel", {
+    body: {action, ...extra}
   });
-  if(error) status.textContent="Error: "+error.message;
-});
 
-async function checkAccess(){
-  privatePanel.classList.add("hidden");
-  document.getElementById("refereeArea").classList.add("hidden");
-  document.getElementById("adminArea").classList.add("hidden");
-
-  const {data,error}=await supabase.auth.getSession();
-
-  if(error || !data.session){
-    login.classList.remove("hidden");
-    status.textContent="Inicia sesión con tu cuenta de Discord para comprobar tus permisos.";
-    return;
-  }
-
-  login.classList.add("hidden");
-  status.textContent="Comprobando permisos de GTFL...";
-
-  const {data:result,error:functionError}=await supabase.functions.invoke("gtfl-panel");
-
-  if(functionError || !result || !result.authenticated){
-    status.textContent="No se ha podido verificar tu cuenta. Cierra sesión e inténtalo de nuevo.";
-    return;
-  }
-
-  if(!result.isReferee && !result.canApprove){
-    status.textContent="Acceso denegado. Tu cuenta no tiene un rol autorizado en GTFL.";
-    return;
-  }
-
-  privatePanel.classList.remove("hidden");
-  status.textContent="";
-
-  document.getElementById("identity").textContent="Discord ID: "+result.discordId;
-
-  if(result.isReferee){
-    document.getElementById("refereeArea").classList.remove("hidden");
-  }
-
-  if(result.canApprove){
-    document.getElementById("adminArea").classList.remove("hidden");
-  }
-
-  document.getElementById("role").textContent=
-    result.canApprove ? "Permiso de dirección autorizado" : "Árbitro autorizado";
+  if (error) throw new Error(error.message || "Error de conexión.");
+  if (!data || data.error) throw new Error(data?.error || "Error del panel.");
+  return data;
 }
 
-document.getElementById("logout").addEventListener("click",async()=>{
+function makeButton(label, action, className = "") {
+  const button = document.createElement("button");
+  button.textContent = label;
+  if (className) button.className = className;
+  button.addEventListener("click", action);
+  return button;
+}
+
+function makeText(tag, value, className = "") {
+  const element = document.createElement(tag);
+  element.textContent = value;
+  if (className) element.className = className;
+  return element;
+}
+
+function latestReport(fixtureId) {
+  return currentData.reports.find(
+    report => Number(report.fixture_id) === Number(fixtureId)
+  );
+}
+
+async function refresh() {
+  $("status").textContent = "Actualizando partidos...";
+  try {
+    currentData = await callPanel("list");
+    renderMatches();
+    renderReports();
+    $("status").textContent = "";
+  } catch (error) {
+    $("status").textContent = error.message;
+  }
+}
+
+function renderMatches() {
+  const container = $("matches");
+  container.replaceChildren();
+
+  const clubs = {};
+  currentData.clubs.forEach(club => {
+    clubs[club.id] = club.name;
+  });
+
+  const jornadas = {};
+  currentData.fixtures.forEach(match => {
+    const day = match.matchday;
+    if (!jornadas[day]) jornadas[day] = [];
+    jornadas[day].push(match);
+  });
+
+  Object.keys(jornadas)
+    .sort((a,b) => Number(a)-Number(b))
+    .forEach(day => {
+      const section = document.createElement("section");
+      section.className = "jornada";
+      section.appendChild(makeText("h2", "Jornada " + day));
+
+      jornadas[day].forEach(match => {
+        const card = document.createElement("article");
+        card.className = "partido";
+
+        const home = clubs[match.home_team_id] || "Equipo " + match.home_team_id;
+        const away = clubs[match.away_team_id] || "Equipo " + match.away_team_id;
+
+        card.appendChild(makeText("div", home + " vs " + away, "teams"));
+        card.appendChild(makeText("div", "Partido #" + match.id, "meta"));
+
+        const report = latestReport(match.id);
+        if (report) {
+          card.appendChild(makeText(
+            "div",
+            "Último informe: " + report.home_score + " - " +
+            report.away_score + " · " + report.status,
+            "state"
+          ));
+        }
+
+        const lockOwner = match.locked_by_discord_id;
+        const actions = document.createElement("div");
+        actions.className = "actions";
+
+        if (!lockOwner) {
+          if (isReferee) {
+            actions.appendChild(makeButton("Reservar y editar", async () => {
+              await perform("lock", {fixtureId: match.id});
+            }));
+          } else {
+            actions.appendChild(makeText("span", "Partido libre", "state"));
+          }
+        } else if (lockOwner === currentUser) {
+          card.appendChild(makeText("div", "Este partido está reservado por ti.", "state"));
+
+          const inputs = document.createElement("div");
+          inputs.className = "result-inputs";
+
+          const homeInput = document.createElement("input");
+          homeInput.type = "number";
+          homeInput.min = "0";
+          homeInput.max = "99";
+          homeInput.placeholder = "Goles de " + home;
+
+          const awayInput = document.createElement("input");
+          awayInput.type = "number";
+          awayInput.min = "0";
+          awayInput.max = "99";
+          awayInput.placeholder = "Goles de " + away;
+
+          inputs.append(homeInput, awayInput);
+          card.appendChild(inputs);
+
+          actions.appendChild(makeButton("Enviar resultado", async () => {
+            if (homeInput.value === "" || awayInput.value === "") {
+              alert("Introduce los dos marcadores.");
+              return;
+            }
+
+            await perform("submit", {
+              fixtureId: match.id,
+              homeScore: homeInput.value,
+              awayScore: awayInput.value
+            });
+          }, "success"));
+        } else {
+          card.appendChild(makeText(
+            "div",
+            "Reservado por el árbitro: " + lockOwner,
+            "state"
+          ));
+        }
+
+        if (canApprove && lockOwner) {
+          actions.appendChild(makeButton("Desbloquear", async () => {
+            if (confirm("¿Quieres desbloquear este partido?")) {
+              await perform("unlock", {fixtureId: match.id});
+            }
+          }, "danger"));
+
+          const targetInput = document.createElement("input");
+          targetInput.placeholder = "ID de Discord del árbitro para reasignar";
+          targetInput.style.maxWidth = "320px";
+          actions.appendChild(targetInput);
+
+          actions.appendChild(makeButton("Reasignar", async () => {
+            if (!targetInput.value.trim()) {
+              alert("Introduce el ID de Discord del árbitro.");
+              return;
+            }
+            await perform("reassign", {
+              fixtureId: match.id,
+              targetDiscordId: targetInput.value.trim()
+            });
+          }, "secondary"));
+        }
+
+        card.appendChild(actions);
+        section.appendChild(card);
+      });
+
+      container.appendChild(section);
+    });
+}
+
+function renderReports() {
+  const container = $("pendingReports");
+  container.replaceChildren();
+
+  if (!canApprove) return;
+
+  const pending = currentData.reports.filter(
+    report => report.status === "pending"
+  );
+
+  if (!pending.length) {
+    container.appendChild(makeText("p", "No hay informes pendientes."));
+    return;
+  }
+
+  pending.forEach(report => {
+    const card = document.createElement("div");
+    card.className = "report";
+
+    card.appendChild(makeText(
+      "strong",
+      "Partido #" + report.fixture_id + ": " +
+      report.home_score + " - " + report.away_score
+    ));
+
+    card.appendChild(makeText(
+      "p",
+      "Enviado por árbitro: " + report.referee_discord_id
+    ));
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+
+    actions.appendChild(makeButton("Aprobar", async () => {
+      await perform("review", {
+        reportId: report.id,
+        decision: "approved"
+      });
+    }, "success"));
+
+    actions.appendChild(makeButton("Rechazar", async () => {
+      await perform("review", {
+        reportId: report.id,
+        decision: "rejected"
+      });
+    }, "danger"));
+
+    card.appendChild(actions);
+    container.appendChild(card);
+  });
+}
+
+async function perform(action, extra) {
+  try {
+    $("status").textContent = "Procesando...";
+    const result = await callPanel(action, extra);
+    $("status").textContent = result.message || "Operación realizada.";
+    await refresh();
+  } catch (error) {
+    $("status").textContent = error.message;
+    alert(error.message);
+  }
+}
+
+$("login").addEventListener("click", async () => {
+  $("status").textContent = "Conectando con Discord...";
+
+  const {error} = await supabase.auth.signInWithOAuth({
+    provider: "discord",
+    options: {redirectTo: window.location.href}
+  });
+
+  if (error) $("status").textContent = error.message;
+});
+
+$("logout").addEventListener("click", async () => {
   await supabase.auth.signOut();
   window.location.reload();
 });
+
+async function checkAccess() {
+  const {data, error} = await supabase.auth.getSession();
+
+  if (error || !data.session) {
+    $("login").classList.remove("hidden");
+    $("status").textContent = "Inicia sesión con tu cuenta de Discord.";
+    return;
+  }
+
+  $("login").classList.add("hidden");
+  $("status").textContent = "Comprobando permisos...";
+
+  try {
+    const result = await callPanel("list");
+
+    currentUser = result.discordId;
+    isReferee = result.isReferee;
+    canApprove = result.canApprove;
+
+    $("identity").textContent = "Discord ID: " + currentUser;
+    $("role").textContent = canApprove
+      ? "Permisos de dirección autorizados"
+      : "Árbitro autorizado";
+
+    $("privatePanel").classList.remove("hidden");
+
+    if (canApprove) {
+      $("adminArea").classList.remove("hidden");
+    }
+
+    await refresh();
+  } catch (error) {
+    $("status").textContent = error.message;
+  }
+}
 
 checkAccess();
 </script>
