@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GTFL | Panel de Árbitros</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #090d16;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .panel {
+      width: 100%;
+      max-width: 480px;
+      background: #111827;
+      border: 1px solid #273449;
+      border-radius: 16px;
+      padding: 35px;
+      text-align: center;
+    }
+
+    .logo {
+      font-size: 36px;
+      font-weight: bold;
+      color: #60a5fa;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-size: 23px;
+      margin-bottom: 12px;
+    }
+
+    p {
+      color: #9ca3af;
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 9px;
+      background: #5865f2;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #4752c4;
+    }
+
+    #status {
+      margin-top: 20px;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .access {
+      margin-top: 20px;
+      padding: 15px;
+      background: #1f2937;
+      border-radius: 10px;
+      text-align: left;
+    }
+
+    .access div {
+      margin: 10px 0;
+    }
+
+    .logout {
+      margin-top: 20px;
+      background: #374151;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="panel">
+    <div class="logo">GTFL</div>
+    <h1>Panel de Árbitros</h1>
+    <p>Glory Touch Football League</p>
+
+    <button id="login">Iniciar sesión con Discord</button>
+
+    <div id="status">Conecta tu cuenta de Discord para continuar.</div>
+
+    <section id="account" class="hidden">
+      <div class="access">
+        <div id="identity"></div>
+        <div id="referee"></div>
+        <div id="approval"></div>
+      </div>
+
+      <button class="logout" id="logout">Cerrar sesión</button>
+    </section>
+  </main>
+
+  <script type="module">
+    import { createClient } from
+      "https://esm.sh/@supabase/supabase-js@2";
+
+    const SUPABASE_URL =
+      "https://ruusgcicoscnaydsimve.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_RjKrgG_mX_XfW9QQGJmJcQ_325gNLq4";
+
+    const supabase = createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+    const loginButton = document.getElementById("login");
+    const logoutButton = document.getElementById("logout");
+    const status = document.getElementById("status");
+    const account = document.getElementById("account");
+
+    loginButton.addEventListener("click", async () => {
+      status.textContent = "Conectando con Discord...";
+
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "discord",
+        options: {
+          redirectTo: window.location.href
+        }
+      });
+
+      if (error) {
+        status.textContent = "Error: " + error.message;
+      }
+    });
+
+    async function checkSession() {
+      const { data, error } = await supabase.auth.getSession();
+
+      if (error || !data.session) {
+        loginButton.classList.remove("hidden");
+        account.classList.add("hidden");
+        status.textContent =
+          "Conecta tu cuenta de Discord para continuar.";
+        return;
+      }
+
+      loginButton.classList.add("hidden");
+      status.textContent = "Comprobando tus permisos...";
+
+      const { data: result, error: functionError } =
+        await supabase.functions.invoke("gtfl-panel");
+
+      if (functionError || !result) {
+        status.textContent =
+          "No se pudieron comprobar tus permisos. " +
+          (functionError?.message || "");
+        return;
+      }
+
+      if (!result.authenticated) {
+        status.textContent =
+          result.error || "No se pudo verificar tu cuenta.";
+        return;
+      }
+
+      account.classList.remove("hidden");
+      status.textContent = "Cuenta verificada.";
+
+      document.getElementById("identity").textContent =
+        "Discord ID: " + result.discordId;
+
+      document.getElementById("referee").textContent =
+        result.isReferee
+          ? "Árbitro: Sí"
+          : "Árbitro: No";
+
+      document.getElementById("approval").textContent =
+        result.canApprove
+          ? "Permiso de aprobación: Sí"
+          : "Permiso de aprobación: No";
+    }
+
+    logoutButton.addEventListener("click", async () => {
+      await supabase.auth.signOut();
+      window.location.reload();
+    });
+
+    supabase.auth.onAuthStateChange(() => {
+      checkSession();
+    });
+
+    checkSession();
+  </script>
+</body>
+</html>
