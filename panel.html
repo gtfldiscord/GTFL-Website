@@ -57,7 +57,6 @@ input,select{background:#0b1220;color:white;border:1px solid #374151;border-radi
 .fft-choice input{width:auto;margin:0}
 .fft-choice span{color:#e5e7eb}
 .mode-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
-.mode-heading button{margin:0}
 @media(max-width:650px){
  body{padding:8px}
  .grid,.mode-grid{grid-template-columns:1fr}
@@ -271,9 +270,9 @@ function addField(parent,label,element) {
 }
 
 function latestReport(fixtureId) {
-  return currentData.reports.find(
-    r => Number(r.fixture_id) === Number(fixtureId)
-  );
+  return currentData.reports
+    .filter(r => Number(r.fixture_id) === Number(fixtureId))
+    .sort((a,b) => Number(b.id)-Number(a.id))[0];
 }
 
 function clubName(id) {
@@ -646,11 +645,14 @@ function createFftForm(match) {
 
   function updateStatus() {
     if(homeInput.checked && awayInput.checked) {
-      status.textContent = "Ambos equipos: -1 punto para cada uno.";
+      status.textContent =
+        "Ambos equipos: marcador 0-0. Cada uno pierde 1 punto si se aprueba.";
     } else if(homeInput.checked) {
-      status.textContent = match.home_name+": -1 punto.";
+      status.textContent =
+        match.home_name+": marcador 0-3. El local pierde 1 punto si se aprueba.";
     } else if(awayInput.checked) {
-      status.textContent = match.away_name+": -1 punto.";
+      status.textContent =
+        match.away_name+": marcador 3-0. El visitante pierde 1 punto si se aprueba.";
     } else {
       status.textContent = "Selecciona el equipo infractor.";
     }
@@ -736,7 +738,7 @@ function renderMatches() {
           if(report.fft_home || report.fft_away) {
             card.appendChild(text(
               "div",
-              "FFT: "+fftDescription(report),
+              "FFT: "+fftDescription(report,match),
               "state"
             ));
           }
@@ -807,10 +809,19 @@ function renderMatches() {
               try {
                 const fft = fftForm.collectFft();
 
+                const expectedHomeScore =
+                  fft.fftHome && !fft.fftAway ? 0 :
+                  !fft.fftHome && fft.fftAway ? 3 : 0;
+
+                const expectedAwayScore =
+                  fft.fftHome && !fft.fftAway ? 3 :
+                  !fft.fftHome && fft.fftAway ? 0 : 0;
+
                 if(!confirm(
                   "¿Enviar el informe FFT?\n\n"+
                   "Local: "+(fft.fftHome ? "Infractor (-1 punto)" : "Sin sanción")+
                   "\nVisitante: "+(fft.fftAway ? "Infractor (-1 punto)" : "Sin sanción")+
+                  "\nMarcador: "+expectedHomeScore+" - "+expectedAwayScore+
                   "\n\nEl informe quedará pendiente de aprobación."
                 )) return;
 
@@ -824,8 +835,8 @@ function renderMatches() {
 
                 alert(
                   "Informe FFT enviado para revisión.\n"+
-                  "Marcador: 0 - 0\n"+
-                  "FFT local: "+(result.fftHome ? "Sí" : "No")+
+                  "Marcador: "+result.homeScore+" - "+result.awayScore+
+                  "\nFFT local: "+(result.fftHome ? "Sí" : "No")+
                   "\nFFT visitante: "+(result.fftAway ? "Sí" : "No")
                 );
 
@@ -890,17 +901,22 @@ function formatMinute(event) {
   return extra > 0 ? `${minute}+${extra}'` : `${minute}'`;
 }
 
-function fftDescription(report) {
+function fftDescription(report,fixture=null) {
+  const match = fixture || fixtureForReport(report);
+
+  const homeName = match?.home_name || "Local";
+  const awayName = match?.away_name || "Visitante";
+
   if(report.fft_home && report.fft_away) {
-    return "Ambos equipos (-1 punto cada uno)";
+    return `${homeName} y ${awayName} (-1 punto para cada uno)`;
   }
 
   if(report.fft_home) {
-    return "Local (-1 punto)";
+    return `${homeName} (local, -1 punto)`;
   }
 
   if(report.fft_away) {
-    return "Visitante (-1 punto)";
+    return `${awayName} (visitante, -1 punto)`;
   }
 
   return "Ninguno";
@@ -931,13 +947,22 @@ function makeActa(report) {
   lines.push(`**${home} ${report.home_score} - ${report.away_score} ${away}**`);
   lines.push("");
 
-  // Acta FFT: no incluye eventos ni datos adicionales.
+  // ACTA FFT: solo marcador, infractor y sanción.
   if(report.fft_home || report.fft_away) {
     lines.push("**INFORME FFT**");
-    lines.push("Equipo infractor: "+fftDescription(report));
+    lines.push("Equipo infractor: "+fftDescription(report,fixture));
     lines.push("");
-    lines.push("Marcador registrado: 0 - 0");
-    lines.push("Sanción pendiente de aprobación por Dirección.");
+    lines.push(
+      `Marcador registrado: ${report.home_score} - ${report.away_score}`
+    );
+
+    if(report.status === "approved") {
+      lines.push("Informe FFT aprobado por Dirección.");
+      lines.push("La sanción correspondiente queda aplicada en la clasificación pública cuando esta procesa los FFT aprobados.");
+    } else {
+      lines.push("Sanción pendiente de aprobación por Dirección.");
+    }
+
     return lines.join("\n");
   }
 
@@ -1100,7 +1125,13 @@ function renderReports() {
     if(report.fft_home || report.fft_away) {
       card.appendChild(text(
         "p",
-        "Equipo infractor: "+fftDescription(report),
+        "Equipo infractor: "+fftDescription(report,fixture),
+        "state"
+      ));
+
+      card.appendChild(text(
+        "p",
+        "Marcador FFT: "+report.home_score+" - "+report.away_score,
         "state"
       ));
     }
@@ -1112,26 +1143,29 @@ function renderReports() {
     const details = document.createElement("div");
     details.className = "report-events";
 
-    events.forEach(e => {
-      const player = playerById(e.player_id);
-      const assist = playerById(e.assist_player_id);
+    // Los informes FFT no muestran eventos.
+    if(!report.fft_home && !report.fft_away) {
+      events.forEach(e => {
+        const player = playerById(e.player_id);
+        const assist = playerById(e.assist_player_id);
 
-      const labels = {
-        goal:e.own_goal ? "Autogol" : "Gol",
-        yellow_card:"Amarilla",
-        red_card:"Roja"
-      };
+        const labels = {
+          goal:e.own_goal ? "Autogol" : "Gol",
+          yellow_card:"Amarilla",
+          red_card:"Roja"
+        };
 
-      details.appendChild(text(
-        "p",
-        (labels[e.event_type] || e.event_type)+
-        " · "+(player?.name || e.player_name || "Jugador")+
-        " · "+formatMinute(e)+
-        (assist ? " · Asistencia: "+assist.name : "")
-      ));
-    });
+        details.appendChild(text(
+          "p",
+          (labels[e.event_type] || e.event_type)+
+          " · "+(player?.name || e.player_name || "Jugador")+
+          " · "+formatMinute(e)+
+          (assist ? " · Asistencia: "+assist.name : "")
+        ));
+      });
 
-    if(events.length) card.appendChild(details);
+      if(events.length) card.appendChild(details);
+    }
 
     const actions = document.createElement("div");
     actions.className = "actions";
@@ -1139,7 +1173,7 @@ function renderReports() {
     actions.appendChild(button("Aprobar",async () => {
       if(confirm(
         report.fft_home || report.fft_away
-          ? "¿Aprobar este informe FFT? La sanción se reflejará en la clasificación pública cuando esta esté configurada para contar FFT aprobados."
+          ? "¿Aprobar este informe FFT? La clasificación pública deberá contar la sanción a partir de este informe aprobado."
           : "¿Aprobar este resultado?"
       )) {
         await perform("review",{
@@ -1185,7 +1219,7 @@ function renderReports() {
     card.appendChild(text(
       "p",
       report.fft_home || report.fft_away
-        ? "Informe FFT aprobado · "+fftDescription(report)
+        ? "Informe FFT aprobado · "+fftDescription(report,fixture)
         : "Partido normal aprobado",
       "state"
     ));
