@@ -7,64 +7,95 @@
 <title>GTFL | Panel Privado</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{min-height:100vh;background:#090d16;color:white;font-family:Arial,sans-serif;padding:18px}
-main{max-width:1050px;margin:35px auto}
-header,.section{background:#111827;border:1px solid #273449;border-radius:13px;padding:22px;margin-bottom:20px}
+body{min-height:100vh;background:#090d16;color:white;font-family:Arial,sans-serif;padding:16px}
+main{max-width:1150px;margin:30px auto}
+header,.section{background:#111827;border:1px solid #273449;border-radius:13px;padding:21px;margin-bottom:18px}
 h1{color:#60a5fa;margin-bottom:8px}
-h2{margin-bottom:12px}
-p{color:#9ca3af;margin-top:8px;line-height:1.5}
-button{padding:11px 15px;border:0;border-radius:7px;background:#5865f2;color:white;font-weight:bold;cursor:pointer;margin-top:12px}
+h2{margin-bottom:13px}
+h3{margin:12px 0}
+p{color:#9ca3af;margin:7px 0;line-height:1.5}
+button{padding:11px 15px;border:0;border-radius:7px;background:#5865f2;color:white;font-weight:bold;cursor:pointer;margin-top:9px}
 button:hover{filter:brightness(1.12)}
 button:disabled{opacity:.45;cursor:not-allowed}
-input{background:#0b1220;color:white;border:1px solid #374151;border-radius:7px;padding:11px;width:100%;margin-top:8px}
+input,select{background:#0b1220;color:white;border:1px solid #374151;border-radius:7px;padding:11px;width:100%;margin-top:8px;min-width:0}
 .hidden{display:none!important}
-#status{color:#d1d5db;margin-top:15px}
-.jornada{background:#111827;border:1px solid #273449;border-radius:12px;padding:17px;margin:18px 0}
+#status{color:#d1d5db;margin-top:14px}
+.jornada,.partido,.report,.player-card{background:#1f2937;border-radius:9px;padding:15px;margin-top:12px}
+.jornada{border:1px solid #273449;margin:18px 0}
 .jornada h2{color:#60a5fa}
-.partido{background:#1f2937;border-radius:9px;padding:15px;margin-top:12px}
 .teams{font-size:17px;font-weight:bold}
 .meta{font-size:12px;color:#9ca3af;margin-top:7px}
 .state{font-size:13px;color:#fbbf24;margin-top:10px}
-.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
 .actions button{margin-top:5px}
 .secondary{background:#374151}
 .danger{background:#991b1b}
 .success{background:#166534}
-.result-inputs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-.report{background:#1f2937;border-radius:9px;padding:15px;margin-top:12px}
 .logout{background:#374151}
-@media(max-width:600px){body{padding:9px}.result-inputs{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.event-row{background:#111827;border:1px solid #374151;padding:12px;border-radius:8px;margin-top:10px}
+.event-row button{background:#991b1b}
+.small{font-size:12px;color:#9ca3af}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:15px}
+.tabs button{background:#273449}
+.tabs button.active{background:#5865f2}
+.report-events{font-size:13px;color:#cbd5e1;margin-top:9px}
+@media(max-width:650px){body{padding:8px}.grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <main>
+
 <header>
   <h1>GTFL</h1>
-  <h2>Panel privado de la liga</h2>
-  <p>Panel exclusivo para árbitros y dirección.</p>
+  <h2>Panel privado</h2>
+  <p>Glory Touch Football League</p>
   <button id="login">Iniciar sesión con Discord</button>
   <div id="status">Comprobando sesión...</div>
 </header>
 
 <section id="privatePanel" class="hidden">
-  <header>
-    <h2>Acceso autorizado</h2>
-    <p id="identity"></p>
-    <p id="role"></p>
-    <button class="logout" id="logout">Cerrar sesión</button>
-  </header>
 
-  <section class="section">
-    <h2>Partidos de GTFL</h2>
-    <p>Todos los árbitros autorizados pueden consultar los 28 partidos.</p>
-    <div id="matches">Cargando partidos...</div>
-  </section>
+<header>
+  <h2>Acceso autorizado</h2>
+  <p id="identity"></p>
+  <p id="role"></p>
+  <button class="logout" id="logout">Cerrar sesión</button>
+</header>
 
-  <section id="adminArea" class="section hidden">
-    <h2>Zona de dirección</h2>
-    <p>Revisa los informes y administra los bloqueos.</p>
-    <div id="pendingReports"></div>
-  </section>
+<div class="tabs">
+  <button id="matchesTab" class="active">Partidos</button>
+  <button id="reportsTab">Informes</button>
+  <button id="playersTab">Plantillas</button>
+</div>
+
+<section id="matchesArea" class="section">
+  <h2>Partidos de GTFL</h2>
+  <p>Consulta las jornadas y gestiona tus reservas arbitrales.</p>
+  <div id="matches">Cargando partidos...</div>
+</section>
+
+<section id="reportsArea" class="section hidden">
+  <h2>Informes de partidos</h2>
+  <p>Dirección puede revisar y aprobar los resultados.</p>
+  <div id="pendingReports"></div>
+</section>
+
+<section id="playersArea" class="section hidden">
+  <h2>Gestión de plantillas</h2>
+  <p>Dirección puede administrar los jugadores de cada club.</p>
+
+  <div class="grid">
+    <input id="newPlayerName" placeholder="Nombre del jugador">
+    <select id="newPlayerClub"></select>
+  </div>
+
+  <button class="success" id="addPlayer">Añadir jugador</button>
+
+  <h3>Jugadores registrados</h3>
+  <div id="playersList"></div>
+</section>
+
 </section>
 </main>
 
@@ -78,172 +109,365 @@ const supabase = createClient(
 );
 
 const $ = id => document.getElementById(id);
+
 let currentUser = null;
 let isReferee = false;
 let canApprove = false;
 let currentData = null;
 
 async function callPanel(action, extra = {}) {
-  const {data, error} = await supabase.functions.invoke("gtfl-panel", {
-    body: {action, ...extra}
-  });
+  const {data,error} = await supabase.functions.invoke(
+    "gtfl-panel",
+    {body:{action,...extra}}
+  );
 
-  if (error) throw new Error(error.message || "Error de conexión.");
-  if (!data || data.error) throw new Error(data?.error || "Error del panel.");
+  if(error) {
+    throw new Error(data?.error || error.message || "Error de conexión.");
+  }
+
+  if(!data || data.error) {
+    throw new Error(data?.error || "Error del panel.");
+  }
+
   return data;
 }
 
-function makeButton(label, action, className = "") {
-  const button = document.createElement("button");
-  button.textContent = label;
-  if (className) button.className = className;
-  button.addEventListener("click", action);
-  return button;
+function button(label, action, cls="") {
+  const b = document.createElement("button");
+  b.textContent = label;
+  b.className = cls;
+  b.addEventListener("click",action);
+  return b;
 }
 
-function makeText(tag, value, className = "") {
-  const element = document.createElement(tag);
-  element.textContent = value;
-  if (className) element.className = className;
-  return element;
+function text(tag,value,cls="") {
+  const el = document.createElement(tag);
+  el.textContent = value ?? "";
+  el.className = cls;
+  return el;
+}
+
+function select(options,placeholder) {
+  const s = document.createElement("select");
+  const first = document.createElement("option");
+  first.value = "";
+  first.textContent = placeholder;
+  s.appendChild(first);
+
+  options.forEach(item => {
+    const option = document.createElement("option");
+    option.value = item.value;
+    option.textContent = item.label;
+    s.appendChild(option);
+  });
+
+  return s;
 }
 
 function latestReport(fixtureId) {
   return currentData.reports.find(
-    report => Number(report.fixture_id) === Number(fixtureId)
+    r => Number(r.fixture_id) === Number(fixtureId)
   );
 }
 
+function clubName(id) {
+  return currentData.clubs.find(
+    c => Number(c.id) === Number(id)
+  )?.name || "Club desconocido";
+}
+
+function playerOptions(clubId) {
+  return currentData.players
+    .filter(p => p.active && Number(p.club_id) === Number(clubId))
+    .map(p => ({value:p.id,label:p.name}));
+}
+
 async function refresh() {
-  $("status").textContent = "Actualizando partidos...";
   try {
+    $("status").textContent = "Actualizando datos...";
     currentData = await callPanel("list");
+
     renderMatches();
     renderReports();
+    renderPlayers();
+
     $("status").textContent = "";
-  } catch (error) {
+  } catch(error) {
     $("status").textContent = error.message;
   }
 }
+
+// ======================================
+// NAVEGACION
+// ======================================
+
+function showTab(tab) {
+  ["matchesArea","reportsArea","playersArea"].forEach(id => {
+    $(id).classList.add("hidden");
+  });
+
+  ["matchesTab","reportsTab","playersTab"].forEach(id => {
+    $(id).classList.remove("active");
+  });
+
+  $(tab+"Area").classList.remove("hidden");
+  $(tab+"Tab").classList.add("active");
+}
+
+$("matchesTab").onclick = () => showTab("matches");
+$("reportsTab").onclick = () => showTab("reports");
+$("playersTab").onclick = () => showTab("players");
+
+// ======================================
+// FORMULARIO DE EVENTOS
+// ======================================
+
+function createEventForm(match) {
+  const container = document.createElement("div");
+
+  container.appendChild(text("h3","Eventos del partido"));
+  container.appendChild(text(
+    "p",
+    "Registra cada gol y tarjeta. El número de goles debe coincidir con el marcador."
+  ));
+
+  const rows = document.createElement("div");
+  const addRow = button("Añadir evento",() => {
+    const row = document.createElement("div");
+    row.className = "event-row";
+
+    const type = select([
+      {value:"goal",label:"Gol"},
+      {value:"yellow_card",label:"Tarjeta amarilla"},
+      {value:"red_card",label:"Tarjeta roja"}
+    ],"Tipo de evento");
+
+    const club = select([
+      {value:match.home_club_id,label:match.home_name},
+      {value:match.away_club_id,label:match.away_name}
+    ],"Seleccionar equipo");
+
+    const player = select([],"Seleccionar jugador");
+    const assist = select([],"Sin asistencia");
+
+    const minute = document.createElement("input");
+    minute.type = "number";
+    minute.min = "0";
+    minute.max = "150";
+    minute.placeholder = "Minuto";
+
+    const assistLabel = text("p","Asistente (solo para goles)");
+
+    function updatePlayers() {
+      const players = playerOptions(club.value);
+
+      player.replaceChildren();
+      const p0 = document.createElement("option");
+      p0.value = "";
+      p0.textContent = "Seleccionar jugador";
+      player.appendChild(p0);
+
+      players.forEach(p => {
+        const o = document.createElement("option");
+        o.value = p.value;
+        o.textContent = p.label;
+        player.appendChild(o);
+      });
+
+      assist.replaceChildren();
+      const a0 = document.createElement("option");
+      a0.value = "";
+      a0.textContent = "Sin asistencia";
+      assist.appendChild(a0);
+
+      players.forEach(p => {
+        const o = document.createElement("option");
+        o.value = p.value;
+        o.textContent = p.label;
+        assist.appendChild(o);
+      });
+    }
+
+    club.addEventListener("change",updatePlayers);
+    type.addEventListener("change",() => {
+      const goal = type.value === "goal";
+      assist.classList.toggle("hidden",!goal);
+      assistLabel.classList.toggle("hidden",!goal);
+    });
+
+    row.append(
+      type,
+      club,
+      player,
+      minute,
+      assistLabel,
+      assist
+    );
+
+    row.appendChild(button("Eliminar evento",() => row.remove()));
+    rows.appendChild(row);
+  });
+
+  addRow.className = "secondary";
+
+  container.append(rows,addRow);
+
+  container.collectEvents = () => {
+    const result = [];
+
+    for(const row of rows.children) {
+      const fields = row.querySelectorAll("select,input");
+      const [type,club,player,minute,assist] = fields;
+
+      if(!type.value || !club.value || !player.value || minute.value==="") {
+        throw new Error("Completa todos los campos de cada evento.");
+      }
+
+      result.push({
+        type:type.value,
+        clubId:Number(club.value),
+        playerId:Number(player.value),
+        minute:Number(minute.value),
+        assistPlayerId:assist.value ? Number(assist.value) : null
+      });
+    }
+
+    return result;
+  };
+
+  return container;
+}
+
+// ======================================
+// PARTIDOS
+// ======================================
 
 function renderMatches() {
   const container = $("matches");
   container.replaceChildren();
 
-  const clubs = {};
-  currentData.clubs.forEach(club => {
-    clubs[club.id] = club.name;
-  });
+  const days = {};
 
-  const jornadas = {};
   currentData.fixtures.forEach(match => {
-    const day = match.matchday;
-    if (!jornadas[day]) jornadas[day] = [];
-    jornadas[day].push(match);
+    const day = match.matchday ?? "Sin jornada";
+    if(!days[day]) days[day] = [];
+    days[day].push(match);
   });
 
-  Object.keys(jornadas)
-    .sort((a,b) => Number(a)-Number(b))
+  Object.keys(days).sort((a,b) => Number(a)-Number(b))
     .forEach(day => {
       const section = document.createElement("section");
       section.className = "jornada";
-      section.appendChild(makeText("h2", "Jornada " + day));
+      section.appendChild(text("h2","Jornada "+day));
 
-      jornadas[day].forEach(match => {
+      days[day].forEach(match => {
         const card = document.createElement("article");
         card.className = "partido";
 
-        const home = clubs[match.home_team_id] || "Equipo " + match.home_team_id;
-        const away = clubs[match.away_team_id] || "Equipo " + match.away_team_id;
+        card.appendChild(text(
+          "div",
+          match.home_name+" vs "+match.away_name,
+          "teams"
+        ));
 
-        card.appendChild(makeText("div", home + " vs " + away, "teams"));
-        card.appendChild(makeText("div", "Partido #" + match.id, "meta"));
+        card.appendChild(text(
+          "div",
+          "Partido #"+match.id+
+          (match.match_date ? " · "+match.match_date : ""),
+          "meta"
+        ));
 
         const report = latestReport(match.id);
-        if (report) {
-          card.appendChild(makeText(
+
+        if(report) {
+          card.appendChild(text(
             "div",
-            "Último informe: " + report.home_score + " - " +
-            report.away_score + " · " + report.status,
+            "Último informe: "+report.home_score+" - "+
+            report.away_score+" · "+report.status,
             "state"
           ));
         }
 
-        const lockOwner = match.locked_by_discord_id;
+        const owner = match.locked_by_discord_id;
         const actions = document.createElement("div");
         actions.className = "actions";
 
-        if (!lockOwner) {
-          if (isReferee) {
-            actions.appendChild(makeButton("Reservar y editar", async () => {
-              await perform("lock", {fixtureId: match.id});
-            }));
-          } else {
-            actions.appendChild(makeText("span", "Partido libre", "state"));
-          }
-        } else if (lockOwner === currentUser) {
-          card.appendChild(makeText("div", "Este partido está reservado por ti.", "state"));
+        if(!owner && isReferee) {
+          actions.appendChild(button("Reservar partido",async () => {
+            await perform("lock",{fixtureId:match.id});
+          }));
+        }
 
-          const inputs = document.createElement("div");
-          inputs.className = "result-inputs";
+        if(owner === currentUser && isReferee) {
+          card.appendChild(text("div","Partido reservado por ti.","state"));
 
-          const homeInput = document.createElement("input");
-          homeInput.type = "number";
-          homeInput.min = "0";
-          homeInput.max = "99";
-          homeInput.placeholder = "Goles de " + home;
+          const score = document.createElement("div");
+          score.className = "grid";
 
-          const awayInput = document.createElement("input");
-          awayInput.type = "number";
-          awayInput.min = "0";
-          awayInput.max = "99";
-          awayInput.placeholder = "Goles de " + away;
+          const home = document.createElement("input");
+          home.type = "number";
+          home.min = "0";
+          home.max = "99";
+          home.placeholder = "Goles "+match.home_name;
 
-          inputs.append(homeInput, awayInput);
-          card.appendChild(inputs);
+          const away = document.createElement("input");
+          away.type = "number";
+          away.min = "0";
+          away.max = "99";
+          away.placeholder = "Goles "+match.away_name;
 
-          actions.appendChild(makeButton("Enviar resultado", async () => {
-            if (homeInput.value === "" || awayInput.value === "") {
-              alert("Introduce los dos marcadores.");
-              return;
+          score.append(home,away);
+          card.appendChild(score);
+
+          const eventForm = createEventForm(match);
+          card.appendChild(eventForm);
+
+          actions.appendChild(button("Enviar informe",async () => {
+            try {
+              if(home.value==="" || away.value==="") {
+                throw new Error("Introduce los dos marcadores.");
+              }
+
+              const events = eventForm.collectEvents();
+
+              await perform("submit",{
+                fixtureId:match.id,
+                homeScore:Number(home.value),
+                awayScore:Number(away.value),
+                events
+              });
+            } catch(error) {
+              alert(error.message);
             }
+          },"success"));
+        }
 
-            await perform("submit", {
-              fixtureId: match.id,
-              homeScore: homeInput.value,
-              awayScore: awayInput.value
-            });
-          }, "success"));
-        } else {
-          card.appendChild(makeText(
+        if(owner && owner !== currentUser) {
+          card.appendChild(text(
             "div",
-            "Reservado por el árbitro: " + lockOwner,
+            "Reservado por árbitro: "+owner,
             "state"
           ));
         }
 
-        if (canApprove && lockOwner) {
-          actions.appendChild(makeButton("Desbloquear", async () => {
-            if (confirm("¿Quieres desbloquear este partido?")) {
-              await perform("unlock", {fixtureId: match.id});
+        if(canApprove && owner) {
+          actions.appendChild(button("Desbloquear",async () => {
+            if(confirm("¿Desbloquear este partido?")) {
+              await perform("unlock",{fixtureId:match.id});
             }
-          }, "danger"));
+          },"danger"));
 
-          const targetInput = document.createElement("input");
-          targetInput.placeholder = "ID de Discord del árbitro para reasignar";
-          targetInput.style.maxWidth = "320px";
-          actions.appendChild(targetInput);
+          const target = document.createElement("input");
+          target.placeholder = "ID Discord del árbitro";
+          target.style.maxWidth = "260px";
+          actions.appendChild(target);
 
-          actions.appendChild(makeButton("Reasignar", async () => {
-            if (!targetInput.value.trim()) {
-              alert("Introduce el ID de Discord del árbitro.");
-              return;
-            }
-            await perform("reassign", {
-              fixtureId: match.id,
-              targetDiscordId: targetInput.value.trim()
+          actions.appendChild(button("Reasignar",async () => {
+            await perform("reassign",{
+              fixtureId:match.id,
+              targetDiscordId:target.value.trim()
             });
-          }, "secondary"));
+          },"secondary"));
         }
 
         card.appendChild(actions);
@@ -254,18 +478,25 @@ function renderMatches() {
     });
 }
 
+// ======================================
+// INFORMES Y APROBACIONES
+// ======================================
+
 function renderReports() {
   const container = $("pendingReports");
   container.replaceChildren();
 
-  if (!canApprove) return;
+  if(!canApprove) {
+    container.appendChild(text("p","No tienes permisos de dirección."));
+    return;
+  }
 
   const pending = currentData.reports.filter(
-    report => report.status === "pending"
+    r => r.status === "pending"
   );
 
-  if (!pending.length) {
-    container.appendChild(makeText("p", "No hay informes pendientes."));
+  if(!pending.length) {
+    container.appendChild(text("p","No hay informes pendientes."));
     return;
   }
 
@@ -273,73 +504,208 @@ function renderReports() {
     const card = document.createElement("div");
     card.className = "report";
 
-    card.appendChild(makeText(
+    card.appendChild(text(
       "strong",
-      "Partido #" + report.fixture_id + ": " +
-      report.home_score + " - " + report.away_score
+      "Partido #"+report.fixture_id+" · "+
+      report.home_score+" - "+report.away_score
     ));
 
-    card.appendChild(makeText(
+    card.appendChild(text(
       "p",
-      "Enviado por árbitro: " + report.referee_discord_id
+      "Árbitro: "+report.referee_discord_id
     ));
+
+    const events = currentData.events.filter(
+      e => Number(e.report_id) === Number(report.id)
+    );
+
+    const details = document.createElement("div");
+    details.className = "report-events";
+
+    events.forEach(e => {
+      const player = currentData.players.find(
+        p => Number(p.id) === Number(e.player_id)
+      );
+
+      const assist = currentData.players.find(
+        p => Number(p.id) === Number(e.assist_player_id)
+      );
+
+      const labels = {
+        goal:"Gol",
+        yellow_card:"Amarilla",
+        red_card:"Roja"
+      };
+
+      details.appendChild(text(
+        "p",
+        (labels[e.event_type] || e.event_type)+
+        " · "+(player?.name || e.player_name || "Jugador")+
+        " · "+e.minute+"'"+
+        (assist ? " · Asistencia: "+assist.name : "")
+      ));
+    });
+
+    card.appendChild(details);
 
     const actions = document.createElement("div");
     actions.className = "actions";
 
-    actions.appendChild(makeButton("Aprobar", async () => {
-      await perform("review", {
-        reportId: report.id,
-        decision: "approved"
-      });
-    }, "success"));
+    actions.appendChild(button("Aprobar",async () => {
+      if(confirm("¿Aprobar este resultado?")) {
+        await perform("review",{
+          reportId:report.id,
+          decision:"approved"
+        });
+      }
+    },"success"));
 
-    actions.appendChild(makeButton("Rechazar", async () => {
-      await perform("review", {
-        reportId: report.id,
-        decision: "rejected"
-      });
-    }, "danger"));
+    actions.appendChild(button("Rechazar",async () => {
+      if(confirm("¿Rechazar este informe?")) {
+        await perform("review",{
+          reportId:report.id,
+          decision:"rejected"
+        });
+      }
+    },"danger"));
 
     card.appendChild(actions);
     container.appendChild(card);
   });
 }
 
-async function perform(action, extra) {
+// ======================================
+// GESTION DE PLANTILLAS
+// ======================================
+
+function renderPlayers() {
+  const clubSelect = $("newPlayerClub");
+  clubSelect.replaceChildren();
+
+  currentData.clubs.forEach(c => {
+    const option = document.createElement("option");
+    option.value = c.id;
+    option.textContent = c.name;
+    clubSelect.appendChild(option);
+  });
+
+  const list = $("playersList");
+  list.replaceChildren();
+
+  currentData.clubs.forEach(club => {
+    const heading = text("h3",club.name);
+    list.appendChild(heading);
+
+    const players = currentData.players.filter(
+      p => Number(p.club_id) === Number(club.id)
+    );
+
+    if(!players.length) {
+      list.appendChild(text("p","No hay jugadores registrados."));
+    }
+
+    players.forEach(player => {
+      const card = document.createElement("div");
+      card.className = "player-card";
+
+      const name = document.createElement("input");
+      name.value = player.name;
+      name.maxLength = 60;
+
+      const clubChoice = select(
+        currentData.clubs.map(c => ({
+          value:c.id,
+          label:c.name
+        })),
+        "Club"
+      );
+      clubChoice.value = player.club_id;
+
+      card.append(
+        text("strong",player.name),
+        text("p",player.active ? "Activo" : "Inactivo","small")
+      );
+
+      const actions = document.createElement("div");
+      actions.className = "actions";
+
+      if(player.active) {
+        actions.appendChild(button("Guardar cambios",async () => {
+          await perform("update_player",{
+            playerId:player.id,
+            name:name.value.trim(),
+            clubId:Number(clubChoice.value)
+          });
+        }));
+
+        actions.appendChild(button("Desactivar",async () => {
+          if(confirm("¿Desactivar a "+player.name+"?")) {
+            await perform("delete_player",{playerId:player.id});
+          }
+        },"danger"));
+      }
+
+      card.append(name,clubChoice,actions);
+      list.appendChild(card);
+    });
+  });
+}
+
+$("addPlayer").onclick = async () => {
+  const name = $("newPlayerName").value.trim();
+  const clubId = Number($("newPlayerClub").value);
+
+  if(!name || !clubId) {
+    alert("Introduce nombre y club.");
+    return;
+  }
+
+  await perform("add_player",{name,clubId});
+  $("newPlayerName").value = "";
+};
+
+// ======================================
+// OPERACIONES
+// ======================================
+
+async function perform(action,extra) {
   try {
     $("status").textContent = "Procesando...";
-    const result = await callPanel(action, extra);
+    const result = await callPanel(action,extra);
     $("status").textContent = result.message || "Operación realizada.";
     await refresh();
-  } catch (error) {
+  } catch(error) {
     $("status").textContent = error.message;
     alert(error.message);
   }
 }
 
-$("login").addEventListener("click", async () => {
+// ======================================
+// DISCORD LOGIN
+// ======================================
+
+$("login").onclick = async () => {
   $("status").textContent = "Conectando con Discord...";
 
   const {error} = await supabase.auth.signInWithOAuth({
-    provider: "discord",
-    options: {redirectTo: window.location.href}
+    provider:"discord",
+    options:{redirectTo:window.location.href}
   });
 
-  if (error) $("status").textContent = error.message;
-});
+  if(error) $("status").textContent = error.message;
+};
 
-$("logout").addEventListener("click", async () => {
+$("logout").onclick = async () => {
   await supabase.auth.signOut();
   window.location.reload();
-});
+};
 
 async function checkAccess() {
-  const {data, error} = await supabase.auth.getSession();
+  const {data,error} = await supabase.auth.getSession();
 
-  if (error || !data.session) {
+  if(error || !data.session) {
     $("login").classList.remove("hidden");
-    $("status").textContent = "Inicia sesión con tu cuenta de Discord.";
+    $("status").textContent = "Inicia sesión con Discord.";
     return;
   }
 
@@ -353,19 +719,20 @@ async function checkAccess() {
     isReferee = result.isReferee;
     canApprove = result.canApprove;
 
-    $("identity").textContent = "Discord ID: " + currentUser;
+    $("identity").textContent = "Discord ID: "+currentUser;
     $("role").textContent = canApprove
-      ? "Permisos de dirección autorizados"
+      ? "Dirección autorizada"
       : "Árbitro autorizado";
 
     $("privatePanel").classList.remove("hidden");
 
-    if (canApprove) {
-      $("adminArea").classList.remove("hidden");
+    if(!canApprove) {
+      $("reportsTab").classList.add("hidden");
+      $("playersTab").classList.add("hidden");
     }
 
     await refresh();
-  } catch (error) {
+  } catch(error) {
     $("status").textContent = error.message;
   }
 }
