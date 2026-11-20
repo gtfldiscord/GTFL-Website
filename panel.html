@@ -57,6 +57,8 @@ textarea{min-height:100px;resize:vertical;line-height:1.5}
 .mode-buttons button{flex:1;min-width:150px}
 .fft-message{border:1px solid #92400e;background:#21190d;border-radius:8px;padding:12px;margin-top:12px}
 .fft-message label{display:block;color:#fbbf24;font-size:13px;font-weight:bold;margin-bottom:5px}
+.reverted-report{border:1px solid #92400e}
+.reverted-label{color:#fca5a5;font-weight:bold;margin-top:10px}
 @media(max-width:650px){
  body{padding:8px}
  .grid{grid-template-columns:1fr}
@@ -100,8 +102,13 @@ textarea{min-height:100px;resize:vertical;line-height:1.5}
   <h2>Informes de partidos</h2>
   <p>Dirección puede revisar y aprobar los resultados.</p>
   <div id="pendingReports"></div>
+
   <h3>Informes aprobados</h3>
   <div id="approvedReports"></div>
+
+  <h3>Informes revertidos</h3>
+  <p>Historial de resultados que Dirección ha revertido.</p>
+  <div id="revertedReports"></div>
 </section>
 
 <section id="playersArea" class="section hidden">
@@ -698,7 +705,8 @@ function renderMatches() {
           card.appendChild(text(
             "div",
             "Último informe: "+report.home_score+" - "+
-            report.away_score+" · "+report.status,
+            report.away_score+" · "+report.status+
+            (report.is_reverted === true ? " · REVERTIDO" : ""),
             "state"
           ));
 
@@ -966,9 +974,11 @@ function makeActa(report) {
       `Marcador registrado: ${report.home_score} - ${report.away_score}`
     );
 
-    if(report.status === "approved") {
+    if(report.status === "approved" && report.is_reverted !== true) {
       lines.push("Informe FFT aprobado por Dirección.");
       lines.push("La sanción correspondiente queda aplicada en la clasificación pública cuando esta procesa los FFT aprobados.");
+    } else if(report.is_reverted === true) {
+      lines.push("Este informe FFT ha sido revertido por Dirección. No debe contar en la clasificación.");
     } else {
       lines.push("Sanción pendiente de aprobación por Dirección.");
     }
@@ -1085,21 +1095,44 @@ function makeActa(report) {
 // INFORMES Y APROBACIONES
 // ======================================
 
+function formatRevertedDate(value) {
+  if(!value) return "Fecha no disponible";
+
+  const date = new Date(value);
+
+  if(Number.isNaN(date.getTime())) return "Fecha no disponible";
+
+  return date.toLocaleString("es-ES",{
+    dateStyle:"short",
+    timeStyle:"short"
+  });
+}
+
 function renderReports() {
   const pendingContainer = $("pendingReports");
   const approvedContainer = $("approvedReports");
+  const revertedContainer = $("revertedReports");
 
   pendingContainer.replaceChildren();
   approvedContainer.replaceChildren();
+  revertedContainer.replaceChildren();
 
   if(!canApprove) {
     pendingContainer.appendChild(text("p","No tienes permisos de dirección."));
     approvedContainer.appendChild(text("p","No tienes permisos de dirección."));
+    revertedContainer.appendChild(text("p","No tienes permisos de dirección."));
     return;
   }
 
-  const pending = currentData.reports.filter(r => r.status === "pending");
-  const approved = currentData.reports.filter(r => r.status === "approved");
+  const reports = currentData.reports || [];
+
+  const pending = reports.filter(r => r.status === "pending");
+  const approved = reports.filter(
+    r => r.status === "approved" && r.is_reverted !== true
+  );
+  const reverted = reports.filter(
+    r => r.status === "approved" && r.is_reverted === true
+  );
 
   if(!pending.length) {
     pendingContainer.appendChild(text("p","No hay informes pendientes."));
@@ -1214,7 +1247,7 @@ function renderReports() {
   });
 
   if(!approved.length) {
-    approvedContainer.appendChild(text("p","Todavía no hay informes aprobados."));
+    approvedContainer.appendChild(text("p","No hay informes aprobados activos."));
   }
 
   approved.forEach(report => {
@@ -1259,8 +1292,105 @@ function renderReports() {
       }
     },"success"));
 
+    // REVERSIÓN: SOLO DIRECCIÓN
+    if(canApprove) {
+      card.appendChild(button("Revertir resultado",async () => {
+        const reason = prompt(
+          "Escribe el motivo obligatorio de la reversión:"
+        );
+
+        if(reason === null) return;
+
+        if(!reason.trim()) {
+          alert("Debes indicar un motivo para revertir el resultado.");
+          return;
+        }
+
+        if(reason.trim().length > 500) {
+          alert("El motivo no puede superar los 500 caracteres.");
+          return;
+        }
+
+        const confirmed = confirm(
+          "¿CONFIRMAS LA REVERSIÓN?\n\n"+
+          "Partido: "+(fixture
+            ? fixture.home_name+" vs "+fixture.away_name
+            : "Partido #"+report.fixture_id)+
+          "\nResultado: "+report.home_score+" - "+report.away_score+
+          "\n\nEl resultado dejará de contar como aprobado y el partido se desbloqueará.\n"+
+          "Si es FFT, su sanción también deberá dejar de contar.\n\n"+
+          "Motivo: "+reason.trim()
+        );
+
+        if(!confirmed) return;
+
+        await perform("revert",{
+          reportId:report.id,
+          reason:reason.trim()
+        });
+      },"danger"));
+    }
+
     approvedContainer.appendChild(card);
   });
+
+  // HISTORIAL DE RESULTADOS REVERTIDOS
+  if(!reverted.length) {
+    revertedContainer.appendChild(
+      text("p","Todavía no hay informes revertidos.")
+    );
+  }
+
+  reverted
+    .sort((a,b) =>
+      new Date(b.reverted_at || 0).getTime() -
+      new Date(a.reverted_at || 0).getTime()
+    )
+    .forEach(report => {
+      const fixture = fixtureForReport(report);
+      const card = document.createElement("div");
+      card.className = "report reverted-report";
+
+      card.appendChild(text(
+        "strong",
+        (fixture
+          ? fixture.home_name+" vs "+fixture.away_name
+          : "Partido #"+report.fixture_id)+
+        " · "+report.home_score+" - "+report.away_score
+      ));
+
+      card.appendChild(text(
+        "p",
+        "Resultado revertido · Partido #"+report.fixture_id,
+        "reverted-label"
+      ));
+
+      card.appendChild(text(
+        "p",
+        report.fft_home || report.fft_away
+          ? "Tipo: FFT · "+fftDescription(report,fixture)
+          : "Tipo: Partido normal",
+        "state"
+      ));
+
+      card.appendChild(text(
+        "p",
+        "Motivo: "+(report.revert_reason || "No especificado")
+      ));
+
+      card.appendChild(text(
+        "p",
+        "Revertido por Discord ID: "+
+        (report.reverted_by_discord_id || "No disponible")
+      ));
+
+      card.appendChild(text(
+        "p",
+        "Fecha: "+formatRevertedDate(report.reverted_at)
+      ));
+
+      revertedContainer.appendChild(card);
+    });
 }
 
 // ======================================
