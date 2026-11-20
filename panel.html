@@ -2,214 +2,125 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GTFL | Panel de Árbitros</title>
-
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      min-height: 100vh;
-      background: #090d16;
-      color: white;
-      font-family: Arial, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .panel {
-      width: 100%;
-      max-width: 480px;
-      background: #111827;
-      border: 1px solid #273449;
-      border-radius: 16px;
-      padding: 35px;
-      text-align: center;
-    }
-
-    .logo {
-      font-size: 36px;
-      font-weight: bold;
-      color: #60a5fa;
-      margin-bottom: 8px;
-    }
-
-    h1 {
-      font-size: 23px;
-      margin-bottom: 12px;
-    }
-
-    p {
-      color: #9ca3af;
-      line-height: 1.5;
-      margin-bottom: 24px;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 9px;
-      background: #5865f2;
-      color: white;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #4752c4;
-    }
-
-    #status {
-      margin-top: 20px;
-      font-size: 14px;
-      overflow-wrap: anywhere;
-    }
-
-    .hidden {
-      display: none;
-    }
-
-    .access {
-      margin-top: 20px;
-      padding: 15px;
-      background: #1f2937;
-      border-radius: 10px;
-      text-align: left;
-    }
-
-    .access div {
-      margin: 10px 0;
-    }
-
-    .logout {
-      margin-top: 20px;
-      background: #374151;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GTFL | Panel Privado</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;background:#090d16;color:white;font-family:Arial,sans-serif;padding:25px}
+main{max-width:850px;margin:70px auto;background:#111827;border:1px solid #273449;border-radius:15px;padding:30px}
+h1{color:#60a5fa;margin-bottom:10px}
+p{color:#9ca3af;margin:12px 0 22px}
+button{padding:13px 20px;border:0;border-radius:8px;background:#5865f2;color:white;font-weight:bold;cursor:pointer}
+button:hover{background:#4752c4}
+.hidden{display:none!important}
+#status{margin-top:20px;color:#d1d5db;line-height:1.5}
+.panel-section{background:#1f2937;border-radius:10px;padding:20px;margin-top:20px}
+.logout{background:#374151;margin-top:20px}
+</style>
 </head>
-
 <body>
-  <main class="panel">
-    <div class="logo">GTFL</div>
-    <h1>Panel de Árbitros</h1>
-    <p>Glory Touch Football League</p>
+<main>
+<h1>GTFL</h1>
+<h2>Panel privado de la liga</h2>
+<p>Acceso exclusivo para árbitros y directiva.</p>
 
-    <button id="login">Iniciar sesión con Discord</button>
+<button id="login">Iniciar sesión con Discord</button>
+<div id="status">Verificando acceso...</div>
 
-    <div id="status">Conecta tu cuenta de Discord para continuar.</div>
+<section id="privatePanel" class="hidden">
+  <div class="panel-section">
+    <h2>Acceso autorizado</h2>
+    <p id="identity"></p>
+    <p id="role"></p>
+  </div>
 
-    <section id="account" class="hidden">
-      <div class="access">
-        <div id="identity"></div>
-        <div id="referee"></div>
-        <div id="approval"></div>
-      </div>
+  <div id="refereeArea" class="panel-section hidden">
+    <h2>Zona de árbitros</h2>
+    <p>Acceso autorizado para consultar partidos y enviar informes.</p>
+  </div>
 
-      <button class="logout" id="logout">Cerrar sesión</button>
-    </section>
-  </main>
+  <div id="adminArea" class="panel-section hidden">
+    <h2>Zona de dirección</h2>
+    <p>Acceso autorizado para gestionar verificaciones.</p>
+  </div>
 
-  <script type="module">
-    import { createClient } from
-      "https://esm.sh/@supabase/supabase-js@2";
+  <button class="logout" id="logout">Cerrar sesión</button>
+</section>
+</main>
 
-    const SUPABASE_URL =
-      "https://ruusgcicoscnaydsimve.supabase.co";
+<script type="module">
+import {createClient} from "https://esm.sh/@supabase/supabase-js@2";
 
-    const SUPABASE_KEY =
-      "sb_publishable_RjKrgG_mX_XfW9QQGJmJcQ_325gNLq4";
+const supabase=createClient(
+  "https://ruusgcicoscnaydsimve.supabase.co",
+  "sb_publishable_RjKrgG_mX_XfW9QQGJmJcQ_325gNLq4"
+);
 
-    const supabase = createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
+const login=document.getElementById("login");
+const status=document.getElementById("status");
+const privatePanel=document.getElementById("privatePanel");
 
-    const loginButton = document.getElementById("login");
-    const logoutButton = document.getElementById("logout");
-    const status = document.getElementById("status");
-    const account = document.getElementById("account");
+login.addEventListener("click",async()=>{
+  status.textContent="Conectando con Discord...";
+  const {error}=await supabase.auth.signInWithOAuth({
+    provider:"discord",
+    options:{redirectTo:window.location.href}
+  });
+  if(error) status.textContent="Error: "+error.message;
+});
 
-    loginButton.addEventListener("click", async () => {
-      status.textContent = "Conectando con Discord...";
+async function checkAccess(){
+  privatePanel.classList.add("hidden");
+  document.getElementById("refereeArea").classList.add("hidden");
+  document.getElementById("adminArea").classList.add("hidden");
 
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "discord",
-        options: {
-          redirectTo: window.location.href
-        }
-      });
+  const {data,error}=await supabase.auth.getSession();
 
-      if (error) {
-        status.textContent = "Error: " + error.message;
-      }
-    });
+  if(error || !data.session){
+    login.classList.remove("hidden");
+    status.textContent="Inicia sesión con tu cuenta de Discord para comprobar tus permisos.";
+    return;
+  }
 
-    async function checkSession() {
-      const { data, error } = await supabase.auth.getSession();
+  login.classList.add("hidden");
+  status.textContent="Comprobando permisos de GTFL...";
 
-      if (error || !data.session) {
-        loginButton.classList.remove("hidden");
-        account.classList.add("hidden");
-        status.textContent =
-          "Conecta tu cuenta de Discord para continuar.";
-        return;
-      }
+  const {data:result,error:functionError}=await supabase.functions.invoke("gtfl-panel");
 
-      loginButton.classList.add("hidden");
-      status.textContent = "Comprobando tus permisos...";
+  if(functionError || !result || !result.authenticated){
+    status.textContent="No se ha podido verificar tu cuenta. Cierra sesión e inténtalo de nuevo.";
+    return;
+  }
 
-      const { data: result, error: functionError } =
-        await supabase.functions.invoke("gtfl-panel");
+  if(!result.isReferee && !result.canApprove){
+    status.textContent="Acceso denegado. Tu cuenta no tiene un rol autorizado en GTFL.";
+    return;
+  }
 
-      if (functionError || !result) {
-        status.textContent =
-          "No se pudieron comprobar tus permisos. " +
-          (functionError?.message || "");
-        return;
-      }
+  privatePanel.classList.remove("hidden");
+  status.textContent="";
 
-      if (!result.authenticated) {
-        status.textContent =
-          result.error || "No se pudo verificar tu cuenta.";
-        return;
-      }
+  document.getElementById("identity").textContent="Discord ID: "+result.discordId;
 
-      account.classList.remove("hidden");
-      status.textContent = "Cuenta verificada.";
+  if(result.isReferee){
+    document.getElementById("refereeArea").classList.remove("hidden");
+  }
 
-      document.getElementById("identity").textContent =
-        "Discord ID: " + result.discordId;
+  if(result.canApprove){
+    document.getElementById("adminArea").classList.remove("hidden");
+  }
 
-      document.getElementById("referee").textContent =
-        result.isReferee
-          ? "Árbitro: Sí"
-          : "Árbitro: No";
+  document.getElementById("role").textContent=
+    result.canApprove ? "Permiso de dirección autorizado" : "Árbitro autorizado";
+}
 
-      document.getElementById("approval").textContent =
-        result.canApprove
-          ? "Permiso de aprobación: Sí"
-          : "Permiso de aprobación: No";
-    }
+document.getElementById("logout").addEventListener("click",async()=>{
+  await supabase.auth.signOut();
+  window.location.reload();
+});
 
-    logoutButton.addEventListener("click", async () => {
-      await supabase.auth.signOut();
-      window.location.reload();
-    });
-
-    supabase.auth.onAuthStateChange(() => {
-      checkSession();
-    });
-
-    checkSession();
-  </script>
+checkAccess();
+</script>
 </body>
 </html>
