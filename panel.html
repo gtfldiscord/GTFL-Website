@@ -48,7 +48,21 @@ input,select{background:#0b1220;color:white;border:1px solid #374151;border-radi
 .hint{font-size:12px;color:#9ca3af}
 .fft-info{background:#111827;border:1px solid #374151;border-radius:8px;padding:12px;margin-top:10px}
 .fft-info strong{color:#fbbf24}
-@media(max-width:650px){body{padding:8px}.grid{grid-template-columns:1fr}header,.section{padding:14px}}
+.mode-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin-top:20px}
+.mode-card{background:#1f2937;border:1px solid #374151;border-radius:12px;padding:22px}
+.mode-card h3{margin-top:0;color:#60a5fa}
+.mode-card p{min-height:45px}
+.mode-card button{width:100%;padding:14px}
+.fft-choice{display:flex;align-items:center;gap:10px;background:#111827;border:1px solid #374151;padding:14px;border-radius:8px;margin-top:10px;cursor:pointer}
+.fft-choice input{width:auto;margin:0}
+.fft-choice span{color:#e5e7eb}
+.mode-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.mode-heading button{margin:0}
+@media(max-width:650px){
+ body{padding:8px}
+ .grid,.mode-grid{grid-template-columns:1fr}
+ header,.section{padding:14px}
+}
 </style>
 </head>
 <body>
@@ -79,8 +93,32 @@ input,select{background:#0b1220;color:white;border:1px solid #374151;border-radi
 
 <section id="matchesArea" class="section">
   <h2>Partidos de GTFL</h2>
-  <p>Consulta las jornadas y gestiona tus reservas arbitrales.</p>
-  <div id="matches">Cargando partidos...</div>
+  <p>Selecciona el tipo de informe que vas a realizar.</p>
+
+  <div id="modeSelector" class="mode-grid">
+    <div class="mode-card">
+      <h3>Partido normal</h3>
+      <p>Acta completa con goles, tarjetas, asistencias, árbitros, MVP y podio.</p>
+      <button id="normalMode">Seleccionar partido normal</button>
+    </div>
+
+    <div class="mode-card">
+      <h3>FFT</h3>
+      <p>Registra una incomparecencia. No necesitas rellenar eventos ni datos del acta.</p>
+      <button id="fftMode" class="danger">Seleccionar FFT</button>
+    </div>
+  </div>
+
+  <div id="matchesModeContent" class="hidden">
+    <div class="mode-heading">
+      <div>
+        <h3 id="selectedModeTitle"></h3>
+        <p id="selectedModeDescription"></p>
+      </div>
+      <button id="backToModes" class="secondary">Volver a modos</button>
+    </div>
+    <div id="matches">Cargando partidos...</div>
+  </div>
 </section>
 
 <section id="reportsArea" class="section hidden">
@@ -123,6 +161,7 @@ let currentUser = null;
 let isReferee = false;
 let canApprove = false;
 let currentData = null;
+let selectedMode = null;
 
 const CLUB_EMOJIS = {
   "real madrid":"<:Madrid:1552397050241622116>",
@@ -284,6 +323,39 @@ async function refresh() {
 }
 
 // ======================================
+// SELECCION DE MODO
+// ======================================
+
+function selectMode(mode) {
+  selectedMode = mode;
+
+  $("modeSelector").classList.add("hidden");
+  $("matchesModeContent").classList.remove("hidden");
+
+  if(mode === "normal") {
+    $("selectedModeTitle").textContent = "Partido normal";
+    $("selectedModeDescription").textContent =
+      "Completa el acta con todos los eventos y datos del encuentro.";
+  } else {
+    $("selectedModeTitle").textContent = "Informe FFT";
+    $("selectedModeDescription").textContent =
+      "Selecciona qué equipo ha cometido la incomparecencia.";
+  }
+
+  renderMatches();
+}
+
+function backToModes() {
+  selectedMode = null;
+  $("matchesModeContent").classList.add("hidden");
+  $("modeSelector").classList.remove("hidden");
+}
+
+$("normalMode").onclick = () => selectMode("normal");
+$("fftMode").onclick = () => selectMode("fft");
+$("backToModes").onclick = backToModes;
+
+// ======================================
 // NAVEGACION
 // ======================================
 
@@ -305,7 +377,7 @@ $("reportsTab").onclick = () => showTab("reports");
 $("playersTab").onclick = () => showTab("players");
 
 // ======================================
-// FORMULARIO DE EVENTOS
+// FORMULARIO DE EVENTOS NORMALES
 // ======================================
 
 function createEventForm(match) {
@@ -479,7 +551,7 @@ function createEventForm(match) {
 }
 
 // ======================================
-// FORMULARIO DEL ACTA + FFT
+// DATOS DEL ACTA NORMAL
 // ======================================
 
 function createReportMetadata(match) {
@@ -510,56 +582,94 @@ function createReportMetadata(match) {
   addField(container,"Podio · 2.º puesto",second);
   addField(container,"Podio · 3.º puesto",third);
 
-  // SELECTOR FFT
-
-  container.appendChild(text("h3","Sanción FFT"));
-
-  const fftSelect = makeSelect([
-    {value:"none",label:"Ninguno"},
-    {value:"home",label:"Local"},
-    {value:"away",label:"Visitante"},
-    {value:"both",label:"Ambos"}
-  ],"Seleccionar sanción FFT");
-
-  fftSelect.value = "none";
-
-  const fftInfo = document.createElement("div");
-  fftInfo.className = "fft-info";
-  fftInfo.appendChild(text(
-    "p",
-    "El equipo que comete FFT pierde 1 punto en la clasificación. Si ambos cometen FFT, ambos pierden 1 punto."
-  ));
-
-  const fftStatus = text("p","Sin sanciones FFT.","hint");
-
-  fftSelect.addEventListener("change",() => {
-    const messages = {
-      none:"Sin sanciones FFT.",
-      home:"FFT del equipo local: -1 punto.",
-      away:"FFT del equipo visitante: -1 punto.",
-      both:"FFT de ambos equipos: -1 punto para cada uno."
-    };
-
-    fftStatus.textContent = messages[fftSelect.value] || messages.none;
+  container.collectMetadata = () => ({
+    secondRefereeDiscordId:secondRef.value.trim() || null,
+    streamerDiscordIds:streamers.value.trim(),
+    journalistDiscordIds:journalists.value.trim(),
+    mvpPlayerId:mvp.value ? Number(mvp.value) : null,
+    podium1PlayerId:first.value ? Number(first.value) : null,
+    podium2PlayerId:second.value ? Number(second.value) : null,
+    podium3PlayerId:third.value ? Number(third.value) : null
   });
 
-  addField(container,"Equipo que comete FFT",fftSelect);
-  fftInfo.appendChild(fftStatus);
-  container.appendChild(fftInfo);
+  return container;
+}
 
-  container.collectMetadata = () => {
-    const fftValue = fftSelect.value || "none";
+// ======================================
+// FORMULARIO FFT
+// ======================================
+
+function createFftForm(match) {
+  const container = document.createElement("div");
+
+  container.appendChild(text("h3","Equipo infractor"));
+  container.appendChild(text(
+    "p",
+    "Selecciona el equipo o los equipos que han cometido FFT. Cada equipo sancionado perderá 1 punto cuando Dirección apruebe el informe."
+  ));
+
+  const choices = document.createElement("div");
+
+  const homeLabel = document.createElement("label");
+  homeLabel.className = "fft-choice";
+
+  const homeInput = document.createElement("input");
+  homeInput.type = "checkbox";
+
+  const homeText = document.createElement("span");
+  homeText.textContent = match.home_name+" (Local)";
+
+  homeLabel.append(homeInput,homeText);
+
+  const awayLabel = document.createElement("label");
+  awayLabel.className = "fft-choice";
+
+  const awayInput = document.createElement("input");
+  awayInput.type = "checkbox";
+
+  const awayText = document.createElement("span");
+  awayText.textContent = match.away_name+" (Visitante)";
+
+  awayLabel.append(awayInput,awayText);
+
+  choices.append(homeLabel,awayLabel);
+  container.appendChild(choices);
+
+  const info = document.createElement("div");
+  info.className = "fft-info";
+
+  const status = text(
+    "p",
+    "Selecciona el equipo infractor.",
+    "hint"
+  );
+
+  function updateStatus() {
+    if(homeInput.checked && awayInput.checked) {
+      status.textContent = "Ambos equipos: -1 punto para cada uno.";
+    } else if(homeInput.checked) {
+      status.textContent = match.home_name+": -1 punto.";
+    } else if(awayInput.checked) {
+      status.textContent = match.away_name+": -1 punto.";
+    } else {
+      status.textContent = "Selecciona el equipo infractor.";
+    }
+  }
+
+  homeInput.addEventListener("change",updateStatus);
+  awayInput.addEventListener("change",updateStatus);
+
+  info.appendChild(status);
+  container.appendChild(info);
+
+  container.collectFft = () => {
+    if(!homeInput.checked && !awayInput.checked) {
+      throw new Error("Selecciona al menos un equipo infractor.");
+    }
 
     return {
-      secondRefereeDiscordId:secondRef.value.trim() || null,
-      streamerDiscordIds:streamers.value.trim(),
-      journalistDiscordIds:journalists.value.trim(),
-      mvpPlayerId:mvp.value ? Number(mvp.value) : null,
-      podium1PlayerId:first.value ? Number(first.value) : null,
-      podium2PlayerId:second.value ? Number(second.value) : null,
-      podium3PlayerId:third.value ? Number(third.value) : null,
-      fftHome:fftValue === "home" || fftValue === "both",
-      fftAway:fftValue === "away" || fftValue === "both"
+      fftHome:homeInput.checked,
+      fftAway:awayInput.checked
     };
   };
 
@@ -573,6 +683,14 @@ function createReportMetadata(match) {
 function renderMatches() {
   const container = $("matches");
   container.replaceChildren();
+
+  if(!currentData) return;
+
+  if(!selectedMode) {
+    $("modeSelector").classList.remove("hidden");
+    $("matchesModeContent").classList.add("hidden");
+    return;
+  }
 
   const days = {};
 
@@ -618,12 +736,7 @@ function renderMatches() {
           if(report.fft_home || report.fft_away) {
             card.appendChild(text(
               "div",
-              "FFT: "+
-              (report.fft_home && report.fft_away
-                ? "Ambos equipos"
-                : report.fft_home
-                  ? "Local"
-                  : "Visitante"),
+              "FFT: "+fftDescription(report),
               "state"
             ));
           }
@@ -642,46 +755,86 @@ function renderMatches() {
         if(owner === currentUser && isReferee) {
           card.appendChild(text("div","Partido reservado por ti.","state"));
 
-          const eventForm = createEventForm(match);
-          const metadataForm = createReportMetadata(match);
+          if(selectedMode === "normal") {
+            const eventForm = createEventForm(match);
+            const metadataForm = createReportMetadata(match);
 
-          card.append(eventForm,metadataForm);
+            card.append(eventForm,metadataForm);
 
-          actions.appendChild(button("Enviar informe",async () => {
-            try {
-              const events = eventForm.collectEvents();
-              const metadata = metadataForm.collectMetadata();
+            actions.appendChild(button("Enviar informe normal",async () => {
+              try {
+                const events = eventForm.collectEvents();
+                const metadata = metadataForm.collectMetadata();
 
-              const selected = [
-                metadata.mvpPlayerId,
-                metadata.podium1PlayerId,
-                metadata.podium2PlayerId,
-                metadata.podium3PlayerId
-              ].filter(Boolean);
+                const selected = [
+                  metadata.mvpPlayerId,
+                  metadata.podium1PlayerId,
+                  metadata.podium2PlayerId,
+                  metadata.podium3PlayerId
+                ].filter(Boolean);
 
-              if(new Set(selected).size !== selected.length) {
-                throw new Error("No puedes repetir un jugador en el MVP y el podio.");
+                if(new Set(selected).size !== selected.length) {
+                  throw new Error("No puedes repetir un jugador en el MVP y el podio.");
+                }
+
+                const result = await callPanel("submit",{
+                  fixtureId:match.id,
+                  mode:"normal",
+                  events,
+                  ...metadata,
+                  fftHome:false,
+                  fftAway:false
+                });
+
+                alert(
+                  "Informe enviado para revisión.\n"+
+                  "Marcador calculado: "+
+                  result.homeScore+" - "+result.awayScore
+                );
+
+                await refresh();
+              } catch(error) {
+                alert(error.message);
               }
+            },"success"));
+          }
 
-              const result = await callPanel("submit",{
-                fixtureId:match.id,
-                events,
-                ...metadata
-              });
+          if(selectedMode === "fft") {
+            const fftForm = createFftForm(match);
+            card.appendChild(fftForm);
 
-              alert(
-                "Informe enviado para revisión.\n"+
-                "Marcador calculado: "+
-                result.homeScore+" - "+result.awayScore+
-                "\nFFT local: "+(result.fftHome ? "Sí" : "No")+
-                "\nFFT visitante: "+(result.fftAway ? "Sí" : "No")
-              );
+            actions.appendChild(button("Enviar informe FFT",async () => {
+              try {
+                const fft = fftForm.collectFft();
 
-              await refresh();
-            } catch(error) {
-              alert(error.message);
-            }
-          },"success"));
+                if(!confirm(
+                  "¿Enviar el informe FFT?\n\n"+
+                  "Local: "+(fft.fftHome ? "Infractor (-1 punto)" : "Sin sanción")+
+                  "\nVisitante: "+(fft.fftAway ? "Infractor (-1 punto)" : "Sin sanción")+
+                  "\n\nEl informe quedará pendiente de aprobación."
+                )) return;
+
+                const result = await callPanel("submit",{
+                  fixtureId:match.id,
+                  mode:"fft",
+                  events:[],
+                  fftHome:fft.fftHome,
+                  fftAway:fft.fftAway
+                });
+
+                alert(
+                  "Informe FFT enviado para revisión.\n"+
+                  "Marcador: 0 - 0\n"+
+                  "FFT local: "+(result.fftHome ? "Sí" : "No")+
+                  "\nFFT visitante: "+(result.fftAway ? "Sí" : "No")
+                );
+
+                await refresh();
+              } catch(error) {
+                alert(error.message);
+              }
+            },"danger"));
+          }
         }
 
         if(owner && owner !== currentUser) {
@@ -765,13 +918,6 @@ function makeActa(report) {
   const homeEmoji = clubEmoji(home);
   const awayEmoji = clubEmoji(away);
 
-  const events = currentData.events
-    .filter(e => Number(e.report_id) === Number(report.id))
-    .sort((a,b) =>
-      Number(a.minute)-Number(b.minute) ||
-      Number(a.stoppage_time || 0)-Number(b.stoppage_time || 0)
-    );
-
   const date = fixture.match_date
     ? fixture.match_date.split("-").reverse().join("/")
     : "Fecha no disponible";
@@ -781,6 +927,19 @@ function makeActa(report) {
   lines.push(`${EMOJI.league} | GTFL - Fecha ${fixture.matchday ?? "?"}`);
   lines.push(`📅 FECHA: ${date}`);
   lines.push("");
+
+  lines.push(`**${home} ${report.home_score} - ${report.away_score} ${away}**`);
+  lines.push("");
+
+  // Acta FFT: no incluye eventos ni datos adicionales.
+  if(report.fft_home || report.fft_away) {
+    lines.push("**INFORME FFT**");
+    lines.push("Equipo infractor: "+fftDescription(report));
+    lines.push("");
+    lines.push("Marcador registrado: 0 - 0");
+    lines.push("Sanción pendiente de aprobación por Dirección.");
+    return lines.join("\n");
+  }
 
   const refereeMentions = [
     report.referee_discord_id,
@@ -806,14 +965,16 @@ function makeActa(report) {
   );
 
   lines.push("");
-
   lines.push(
     `**${homeEmoji ? homeEmoji+" " : ""}${home} ${report.home_score} - ${report.away_score} ${away}${awayEmoji ? " "+awayEmoji : ""}**`
   );
 
-  lines.push("");
-  lines.push("**FFT / SANCIONES:**");
-  lines.push(fftDescription(report));
+  const events = currentData.events
+    .filter(e => Number(e.report_id) === Number(report.id))
+    .sort((a,b) =>
+      Number(a.minute)-Number(b.minute) ||
+      Number(a.stoppage_time || 0)-Number(b.stoppage_time || 0)
+    );
 
   lines.push("");
   lines.push("**EVENTOS DEL PARTIDO**");
@@ -825,9 +986,6 @@ function makeActa(report) {
   events.forEach(event => {
     const player = playerById(event.player_id);
     const assist = playerById(event.assist_player_id);
-    const team = clubName(event.club_id);
-    const teamEmoji = clubEmoji(team);
-
     const playerText = discordUser(player);
     const minute = formatMinute(event);
 
@@ -916,10 +1074,14 @@ function renderReports() {
     const card = document.createElement("div");
     card.className = "report";
 
+    const fixture = fixtureForReport(report);
+    const title = fixture
+      ? fixture.home_name+" vs "+fixture.away_name
+      : "Partido #"+report.fixture_id;
+
     card.appendChild(text(
       "strong",
-      "Partido #"+report.fixture_id+" · "+
-      report.home_score+" - "+report.away_score
+      title+" · "+report.home_score+" - "+report.away_score
     ));
 
     card.appendChild(text(
@@ -929,9 +1091,19 @@ function renderReports() {
 
     card.appendChild(text(
       "p",
-      "FFT / Sanciones: "+fftDescription(report),
+      report.fft_home || report.fft_away
+        ? "Tipo de informe: FFT"
+        : "Tipo de informe: Partido normal",
       "state"
     ));
+
+    if(report.fft_home || report.fft_away) {
+      card.appendChild(text(
+        "p",
+        "Equipo infractor: "+fftDescription(report),
+        "state"
+      ));
+    }
 
     const events = currentData.events.filter(
       e => Number(e.report_id) === Number(report.id)
@@ -959,13 +1131,17 @@ function renderReports() {
       ));
     });
 
-    card.appendChild(details);
+    if(events.length) card.appendChild(details);
 
     const actions = document.createElement("div");
     actions.className = "actions";
 
     actions.appendChild(button("Aprobar",async () => {
-      if(confirm("¿Aprobar este resultado?")) {
+      if(confirm(
+        report.fft_home || report.fft_away
+          ? "¿Aprobar este informe FFT? La sanción se reflejará en la clasificación pública cuando esta esté configurada para contar FFT aprobados."
+          : "¿Aprobar este resultado?"
+      )) {
         await perform("review",{
           reportId:report.id,
           decision:"approved"
@@ -1008,7 +1184,9 @@ function renderReports() {
 
     card.appendChild(text(
       "p",
-      "FFT / Sanciones: "+fftDescription(report),
+      report.fft_home || report.fft_away
+        ? "Informe FFT aprobado · "+fftDescription(report)
+        : "Partido normal aprobado",
       "state"
     ));
 
