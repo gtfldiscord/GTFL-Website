@@ -123,7 +123,7 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
 .stat-card{padding:20px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:9px}
 .stat-card h3{font-size:14px;margin-bottom:7px}
-.stat-card p{font-size:12px;opacity:.5}
+.stat-card p{font-size:12px;opacity:.75;line-height:1.8;overflow-wrap:anywhere}
 
 .pending{
     min-height:330px;display:flex;flex-direction:column;
@@ -227,10 +227,10 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
         <p class="section-description">Estadísticas de la Copa GTFL · Temporada 1</p>
 
         <div class="stats-grid">
-            <div class="stat-card"><h3>GOLEADORES</h3><p>Las estadísticas aparecerán aquí.</p></div>
-            <div class="stat-card"><h3>ASISTENCIAS</h3><p>Las estadísticas aparecerán aquí.</p></div>
-            <div class="stat-card"><h3>TARJETAS</h3><p>Las estadísticas aparecerán aquí.</p></div>
-            <div class="stat-card"><h3>PORTERÍAS A CERO</h3><p>Las estadísticas aparecerán aquí.</p></div>
+            <div class="stat-card"><h3>GOLEADORES</h3><p>Cargando...</p></div>
+            <div class="stat-card"><h3>ASISTENCIAS</h3><p>Cargando...</p></div>
+            <div class="stat-card"><h3>TARJETAS</h3><p>Cargando...</p></div>
+            <div class="stat-card"><h3>PORTERÍAS A CERO</h3><p>Cargando...</p></div>
         </div>
     </section>
 </div>
@@ -256,18 +256,28 @@ tbody tr:hover{background:rgba(255,255,255,.05)}
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+/* =========================
+   CONEXIÓN SUPABASE
+========================= */
+
 const SUPABASE_URL = "https://ruusgcicoscnaydsimve.supabase.co";
 const SUPABASE_KEY = "sb_publishable_RjKrgG_mX_XfW9QQGJmJcQ_325gNLq4";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+/* =========================
+   DATOS
+========================= */
+
 const clubLogos = {
     "AD Ceuta": "ceuta.png",
     "Athletic Club": "athletic.png",
     "FC Barcelona": "barcelona.png",
+    "Málaga FC": "malaga.png",
     "Málaga CF": "malaga.png",
     "Real Madrid": "madrid.png",
     "Real Zaragoza": "zaragoza.png",
+    "Deportivo de La Coruña": "depor.png",
     "RC Deportivo": "depor.png",
     "Racing de Santander": "racing.png"
 };
@@ -276,10 +286,22 @@ let clubs = [];
 let fixtures = [];
 let matchdays = [];
 let reports = [];
+let standings = [];
+let scorers = [];
+let assists = [];
+let playerCards = [];
+
+/* =========================
+   UTILIDADES
+========================= */
 
 function escapeHTML(value) {
     return String(value ?? "").replace(/[&<>"']/g, char => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
     })[char]);
 }
 
@@ -291,18 +313,38 @@ function formatDate(date) {
     if (!date) return "Fecha pendiente";
 
     const parts = String(date).split("-");
-    if (parts.length !== 3) return escapeHTML(date);
+
+    if (parts.length !== 3) {
+        return escapeHTML(date);
+    }
 
     return `${parts[2]}/${parts[1]}/${parts[0]}`;
 }
 
 function setStatus(id, message, type = "") {
     const element = document.getElementById(id);
+
+    if (!element) return;
+
     element.textContent = message;
     element.className = "status-message" + (type ? " " + type : "");
 }
 
-/* CARGAR DATOS DE SUPABASE */
+function approvedReport(fixtureId) {
+    return reports.find(report =>
+        Number(report.fixture_id) === Number(fixtureId)
+    ) || null;
+}
+
+function findClub(clubId) {
+    return clubs.find(club =>
+        Number(club.id) === Number(clubId)
+    ) || null;
+}
+
+/* =========================
+   CARGAR DATOS DE SUPABASE
+========================= */
 
 async function loadLeague() {
     setStatus("standings-status", "Cargando clasificación...");
@@ -313,39 +355,113 @@ async function loadLeague() {
             clubsResult,
             fixturesResult,
             matchdaysResult,
-            reportsResult
+            reportsResult,
+            standingsResult,
+            scorersResult,
+            assistsResult,
+            cardsResult
         ] = await Promise.all([
-            supabase.from("clubs").select("id,name").order("id"),
-            supabase.from("fixtures").select("id,matchday_id,home_club_id,away_club_id").order("id"),
-            supabase.from("matchdays").select("id,number,match_date").order("number"),
-            supabase.from("match_reports")
+
+            supabase
+                .from("clubs")
+                .select("id,name")
+                .order("id"),
+
+            supabase
+                .from("fixtures")
+                .select("id,matchday_id,home_club_id,away_club_id")
+                .order("id"),
+
+            supabase
+                .from("matchdays")
+                .select("id,number,match_date")
+                .order("number"),
+
+            supabase
+                .from("match_reports")
                 .select("fixture_id,home_score,away_score,status,fft_home,fft_away")
-                .eq("status", "approved")
+                .eq("status", "approved"),
+
+            supabase
+                .from("league_standings")
+                .select("*"),
+
+            supabase
+                .from("top_scorers")
+                .select("*")
+                .order("goals", { ascending: false })
+                .limit(10),
+
+            supabase
+                .from("top_assists")
+                .select("*")
+                .order("assists", { ascending: false })
+                .limit(10),
+
+            supabase
+                .from("player_cards")
+                .select("*")
         ]);
 
-        if (clubsResult.error) throw clubsResult.error;
-        if (fixturesResult.error) throw fixturesResult.error;
-        if (matchdaysResult.error) throw matchdaysResult.error;
-        if (reportsResult.error) throw reportsResult.error;
+        const results = [
+            clubsResult,
+            fixturesResult,
+            matchdaysResult,
+            reportsResult,
+            standingsResult,
+            scorersResult,
+            assistsResult,
+            cardsResult
+        ];
+
+        const failed = results.find(result => result.error);
+
+        if (failed) {
+            throw failed.error;
+        }
 
         clubs = clubsResult.data || [];
         fixtures = fixturesResult.data || [];
         matchdays = matchdaysResult.data || [];
         reports = reportsResult.data || [];
+        standings = standingsResult.data || [];
+        scorers = scorersResult.data || [];
+        assists = assistsResult.data || [];
+        playerCards = cardsResult.data || [];
 
         renderStandings();
         renderFixtures();
+        renderStatistics();
 
-        setStatus("standings-status", "Clasificación actualizada desde Supabase.", "success");
-        setStatus("fixtures-status", "Resultados oficiales actualizados.", "success");
+        setStatus(
+            "standings-status",
+            "Clasificación oficial actualizada.",
+            "success"
+        );
+
+        setStatus(
+            "fixtures-status",
+            "Resultados oficiales actualizados.",
+            "success"
+        );
 
     } catch (error) {
         console.error("Error cargando GTFL:", error);
 
-        const message = error.message || "Error desconocido al conectar con Supabase.";
+        const message =
+            error.message || "Error desconocido al conectar con Supabase.";
 
-        setStatus("standings-status", "No se pudo cargar la clasificación: " + message, "error");
-        setStatus("fixtures-status", "No se pudieron cargar los partidos: " + message, "error");
+        setStatus(
+            "standings-status",
+            "No se pudo cargar la clasificación: " + message,
+            "error"
+        );
+
+        setStatus(
+            "fixtures-status",
+            "No se pudieron cargar los partidos: " + message,
+            "error"
+        );
 
         document.getElementById("standings-body").innerHTML =
             '<tr><td colspan="10">No se pudieron cargar los datos.</td></tr>';
@@ -354,134 +470,79 @@ async function loadLeague() {
     }
 }
 
-/* BUSCAR EL INFORME APROBADO DE UN PARTIDO */
-
-function approvedReport(fixtureId) {
-    return reports.find(report =>
-        Number(report.fixture_id) === Number(fixtureId)
-    ) || null;
-}
-
-/* CALCULAR CLASIFICACIÓN */
+/* =========================
+   CLASIFICACIÓN
+   USA LA VISTA DE SUPABASE
+========================= */
 
 function renderStandings() {
-    const table = {};
-
-    clubs.forEach(club => {
-        table[club.id] = {
-            id: club.id,
-            name: club.name,
-            played: 0,
-            won: 0,
-            drawn: 0,
-            lost: 0,
-            goalsFor: 0,
-            goalsAgainst: 0,
-            fftSanctions: 0,
-            points: 0
-        };
-    });
-
-    fixtures.forEach(fixture => {
-        const report = approvedReport(fixture.id);
-        if (!report) return;
-
-        const home = table[fixture.home_club_id];
-        const away = table[fixture.away_club_id];
-
-        if (!home || !away) return;
-
-        const homeScore = Number(report.home_score);
-        const awayScore = Number(report.away_score);
-
-        home.played++;
-        away.played++;
-
-        home.goalsFor += homeScore;
-        home.goalsAgainst += awayScore;
-
-        away.goalsFor += awayScore;
-        away.goalsAgainst += homeScore;
-
-        if (homeScore > awayScore) {
-            home.won++;
-            away.lost++;
-        } else if (homeScore < awayScore) {
-            away.won++;
-            home.lost++;
-        } else {
-            home.drawn++;
-            away.drawn++;
-        }
-
-        // Puntuación deportiva normal
-        home.points += homeScore > awayScore ? 3 : homeScore === awayScore ? 1 : 0;
-        away.points += awayScore > homeScore ? 3 : awayScore === homeScore ? 1 : 0;
-
-        // Penalizaciones FFT: solo informes aprobados.
-        // Cada equipo señalado pierde un punto por informe.
-        if (report.fft_home === true) {
-            home.fftSanctions++;
-            home.points--;
-        }
-
-        if (report.fft_away === true) {
-            away.fftSanctions++;
-            away.points--;
-        }
-    });
-
-    const ranking = Object.values(table).map(team => ({
-        ...team,
-        goalDifference: team.goalsFor - team.goalsAgainst
-    }));
-
-    ranking.sort((a, b) =>
-        b.points - a.points ||
-        b.goalDifference - a.goalDifference ||
-        b.goalsFor - a.goalsFor ||
-        b.won - a.won ||
-        a.name.localeCompare(b.name)
-    );
-
     const body = document.getElementById("standings-body");
 
-    if (!ranking.length) {
-        body.innerHTML = '<tr><td colspan="10">No hay clubes registrados.</td></tr>';
+    if (!standings.length) {
+        body.innerHTML =
+            '<tr><td colspan="10">No hay clubes registrados.</td></tr>';
         return;
     }
 
-    body.innerHTML = ranking.map((team, index) => `
-        <tr>
-            <td class="position">${index + 1}</td>
-            <td>
-                <div class="club">
-                    <img src="${escapeHTML(logoForClub(team.name))}" class="club-logo" alt="">
-                    ${escapeHTML(team.name)}
-                    ${team.fftSanctions > 0
-                        ? `<span class="fft-count" title="Sanciones FFT">-${team.fftSanctions}</span>`
-                        : ""}
-                </div>
-            </td>
-            <td>${team.played}</td>
-            <td>${team.won}</td>
-            <td>${team.drawn}</td>
-            <td>${team.lost}</td>
-            <td>${team.goalsFor}</td>
-            <td>${team.goalsAgainst}</td>
-            <td>${team.goalDifference > 0 ? "+" : ""}${team.goalDifference}</td>
-            <td class="points ${team.points < 0 ? "negative-points" : ""}">${team.points}</td>
-        </tr>
-    `).join("");
+    const ranking = [...standings].sort((a, b) =>
+        Number(b.points) - Number(a.points) ||
+        Number(b.goal_difference) - Number(a.goal_difference) ||
+        Number(b.goals_for) - Number(a.goals_for) ||
+        Number(b.won) - Number(a.won) ||
+        String(a.club_name).localeCompare(String(b.club_name))
+    );
+
+    body.innerHTML = ranking.map((team, index) => {
+        const sanctions = Number(team.fft_sanctions || 0);
+        const points = Number(team.points || 0);
+
+        return `
+            <tr>
+                <td class="position">${index + 1}</td>
+
+                <td>
+                    <div class="club">
+                        <img
+                            src="${escapeHTML(logoForClub(team.club_name))}"
+                            class="club-logo"
+                            alt=""
+                        >
+                        ${escapeHTML(team.club_name)}
+
+                        ${sanctions > 0
+                            ? `<span class="fft-count" title="Sanciones FFT">-${sanctions}</span>`
+                            : ""}
+                    </div>
+                </td>
+
+                <td>${Number(team.played || 0)}</td>
+                <td>${Number(team.won || 0)}</td>
+                <td>${Number(team.drawn || 0)}</td>
+                <td>${Number(team.lost || 0)}</td>
+                <td>${Number(team.goals_for || 0)}</td>
+                <td>${Number(team.goals_against || 0)}</td>
+                <td>
+                    ${Number(team.goal_difference) > 0 ? "+" : ""}
+                    ${Number(team.goal_difference || 0)}
+                </td>
+                <td class="points ${points < 0 ? "negative-points" : ""}">
+                    ${points}
+                </td>
+            </tr>
+        `;
+    }).join("");
 }
 
-/* MOSTRAR FIXTURES Y RESULTADOS */
+/* =========================
+   FIXTURES Y RESULTADOS
+========================= */
 
 function renderFixtures() {
     const container = document.getElementById("fixtures-container");
 
     if (!fixtures.length) {
-        container.innerHTML = '<div class="status-message">No hay partidos registrados en Supabase.</div>';
+        container.innerHTML =
+            '<div class="status-message">No hay partidos registrados en Supabase.</div>';
         return;
     }
 
@@ -495,6 +556,7 @@ function renderFixtures() {
 
     fixtures.forEach(fixture => {
         const day = matchdayMap[fixture.matchday_id];
+
         const number = day?.number ?? fixture.matchday_id ?? "Sin jornada";
 
         if (!grouped[number]) {
@@ -513,22 +575,27 @@ function renderFixtures() {
     );
 
     container.innerHTML = days.map(day => {
+
         const matches = day.matches.map(fixture => {
-            const home = clubs.find(club => Number(club.id) === Number(fixture.home_club_id));
-            const away = clubs.find(club => Number(club.id) === Number(fixture.away_club_id));
+
+            const home = findClub(fixture.home_club_id);
+            const away = findClub(fixture.away_club_id);
 
             const homeName = home?.name || "Equipo local";
             const awayName = away?.name || "Equipo visitante";
 
             const report = approvedReport(fixture.id);
 
-            let scoreHTML = '<div class="score unplayed">VS</div>';
+            let scoreHTML = `
+                <div class="score unplayed">VS</div>
+            `;
 
             if (report) {
                 const fftHome = report.fft_home === true;
                 const fftAway = report.fft_away === true;
 
                 let fftText = "";
+
                 if (fftHome && fftAway) {
                     fftText = "FFT ambos equipos";
                 } else if (fftHome) {
@@ -540,38 +607,195 @@ function renderFixtures() {
                 scoreHTML = `
                     <div class="score">
                         ${Number(report.home_score)} - ${Number(report.away_score)}
-                        <span class="result-label">RESULTADO OFICIAL</span>
-                        ${fftText ? `<span class="fft-label">${fftText}</span>` : ""}
+
+                        <span class="result-label">
+                            RESULTADO OFICIAL
+                        </span>
+
+                        ${fftText
+                            ? `<span class="fft-label">${fftText}</span>`
+                            : ""}
                     </div>
                 `;
             }
 
             return `
                 <div class="fixture">
+
                     <div class="team home">
                         ${escapeHTML(homeName)}
-                        <img src="${escapeHTML(logoForClub(homeName))}" class="fixture-logo" alt="">
+                        <img
+                            src="${escapeHTML(logoForClub(homeName))}"
+                            class="fixture-logo"
+                            alt=""
+                        >
                     </div>
+
                     ${scoreHTML}
+
                     <div class="team away">
-                        <img src="${escapeHTML(logoForClub(awayName))}" class="fixture-logo" alt="">
+                        <img
+                            src="${escapeHTML(logoForClub(awayName))}"
+                            class="fixture-logo"
+                            alt=""
+                        >
                         ${escapeHTML(awayName)}
                     </div>
+
                 </div>
             `;
+
         }).join("");
 
         return `
             <div class="matchday">
-                <div class="matchday-title">JORNADA ${escapeHTML(day.number)}</div>
-                <div class="matchday-date">${formatDate(day.date)}</div>
+
+                <div class="matchday-title">
+                    JORNADA ${escapeHTML(day.number)}
+                </div>
+
+                <div class="matchday-date">
+                    ${formatDate(day.date)}
+                </div>
+
                 ${matches}
+
             </div>
         `;
+
     }).join("");
 }
 
-/* CAMBIAR COMPETICIÓN */
+/* =========================
+   ESTADÍSTICAS
+========================= */
+
+function renderStatistics() {
+    const cards = Array.from(
+        document.querySelectorAll("#copa-estadisticas .stat-card")
+    );
+
+    const getCard = title => cards.find(card =>
+        card.querySelector("h3")?.textContent.trim() === title
+    );
+
+    /* GOLEADORES */
+
+    const scorerCard = getCard("GOLEADORES");
+
+    if (scorerCard) {
+        const paragraph = scorerCard.querySelector("p");
+
+        paragraph.textContent = scorers.length
+            ? scorers.map((player, index) =>
+                `${index + 1}. ${player.player_name} (${player.club_name}): ${player.goals}`
+            ).join(" | ")
+            : "Todavía no hay goles registrados.";
+    }
+
+    /* ASISTENCIAS */
+
+    const assistsCard = getCard("ASISTENCIAS");
+
+    if (assistsCard) {
+        const paragraph = assistsCard.querySelector("p");
+
+        paragraph.textContent = assists.length
+            ? assists.map((player, index) =>
+                `${index + 1}. ${player.player_name} (${player.club_name}): ${player.assists}`
+            ).join(" | ")
+            : "Todavía no hay asistencias registradas.";
+    }
+
+    /* TARJETAS */
+
+    const cardsCard = getCard("TARJETAS");
+
+    if (cardsCard) {
+        const paragraph = cardsCard.querySelector("p");
+
+        const rankedCards = playerCards
+            .filter(player =>
+                Number(player.yellow_cards) > 0 ||
+                Number(player.red_cards) > 0
+            )
+            .sort((a, b) =>
+                (
+                    Number(b.yellow_cards) +
+                    Number(b.red_cards) * 2
+                ) - (
+                    Number(a.yellow_cards) +
+                    Number(a.red_cards) * 2
+                )
+            )
+            .slice(0, 10);
+
+        paragraph.textContent = rankedCards.length
+            ? rankedCards.map(player =>
+                `${player.player_name} (${player.club_name}): ${player.yellow_cards} amarillas, ${player.red_cards} rojas`
+            ).join(" | ")
+            : "Todavía no hay tarjetas registradas.";
+    }
+
+    /* PORTERÍAS A CERO */
+
+    const cleanSheetsCard = getCard("PORTERÍAS A CERO");
+
+    if (cleanSheetsCard) {
+        const cleanSheets = new Map();
+
+        clubs.forEach(club => {
+            cleanSheets.set(Number(club.id), 0);
+        });
+
+        reports.forEach(report => {
+            const fixture = fixtures.find(item =>
+                Number(item.id) === Number(report.fixture_id)
+            );
+
+            if (!fixture) return;
+
+            if (Number(report.away_score) === 0) {
+                const id = Number(fixture.home_club_id);
+
+                cleanSheets.set(
+                    id,
+                    (cleanSheets.get(id) || 0) + 1
+                );
+            }
+
+            if (Number(report.home_score) === 0) {
+                const id = Number(fixture.away_club_id);
+
+                cleanSheets.set(
+                    id,
+                    (cleanSheets.get(id) || 0) + 1
+                );
+            }
+        });
+
+        const rankedCleanSheets = clubs
+            .map(club => ({
+                name: club.name,
+                total: cleanSheets.get(Number(club.id)) || 0
+            }))
+            .filter(club => club.total > 0)
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 10);
+
+        const paragraph = cleanSheetsCard.querySelector("p");
+
+        paragraph.textContent = rankedCleanSheets.length
+            ? rankedCleanSheets.map((club, index) =>
+                `${index + 1}. ${club.name}: ${club.total}`
+            ).join(" | ")
+            : "Todavía no hay porterías a cero.";
+    }
+}
+
+/* =========================
+   CAMBIAR COMPETICIÓN
+========================= */
 
 window.selectCompetition = function(id, button) {
     document.querySelectorAll(".competition-content").forEach(content =>
@@ -586,7 +810,9 @@ window.selectCompetition = function(id, button) {
     button.classList.add("active");
 };
 
-/* CAMBIAR PESTAÑA */
+/* =========================
+   CAMBIAR PESTAÑA
+========================= */
 
 window.showTab = function(id, button) {
     const parent = button.closest(".competition-content");
@@ -603,13 +829,18 @@ window.showTab = function(id, button) {
     button.classList.add("active");
 };
 
-/* ACTUALIZACIÓN MANUAL */
+/* =========================
+   ACTUALIZAR MANUALMENTE
+========================= */
 
 window.loadLeague = loadLeague;
 
-/* CARGA INICIAL */
+/* =========================
+   CARGA INICIAL
+========================= */
 
 loadLeague();
+
 </script>
 
 </body>
